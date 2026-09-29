@@ -13,7 +13,7 @@
     label{display:block;font-size:12px;font-weight:700;margin-bottom:4px;color:#53657a}input,select,button{font:inherit;padding:9px;border:1px solid #cbd5e1;border-radius:7px}input,select{width:100%}button{cursor:pointer;background:#fff}.primary{background:var(--blue);color:#fff;border-color:var(--blue)}
     .muted{color:var(--muted);font-size:12px}.warn{color:var(--warn);font-weight:700}.good{color:var(--ok);font-weight:700}.row{display:flex;gap:8px;align-items:center}.pill{background:#eef2f7;color:#243a53;padding:3px 7px;border-radius:999px;font-size:11px}
     .toolbar{display:flex;gap:8px;align-items:center;margin-bottom:10px}.toolbar input{flex:1}.tablewrap{overflow:auto;border:1px solid var(--line);border-radius:10px;background:#fff}
-    table{border-collapse:collapse;width:100%;min-width:1340px;table-layout:fixed}th,td{padding:6px 7px;border-bottom:1px solid #edf0f4;text-align:left;vertical-align:middle;overflow-wrap:anywhere}tbody tr{transition:background-color .12s ease}tbody tr:hover{background:#eef6ff}tbody tr.dirtyRow:hover{background:#fff7d6}th{background:#eef3f8;font-size:10.5px;text-transform:uppercase;position:sticky;top:0;white-space:nowrap;overflow-wrap:normal}.right{text-align:right}.asinStack{line-height:1.35;white-space:normal}.actions{display:flex;gap:4px;flex-wrap:nowrap;align-items:center}.actions button{padding:5px 7px;font-size:12px;white-space:nowrap}.cellInput{width:100%;min-width:0;padding:4px 5px;border:1px solid transparent;border-radius:4px;background:transparent;color:inherit}.cellInput:hover{border-color:#d8dee8;background:#fff}.cellInput:focus{outline:none;border-color:#1769aa;background:#fff;box-shadow:0 0 0 2px #1769aa18}.cellInput.num{text-align:right}.dirtyRow{background:#fffdf2}.saveBtn{min-width:52px}th:nth-child(1),td:nth-child(1){width:68px}th:nth-child(2),td:nth-child(2){width:100px}th:nth-child(3),td:nth-child(3){width:78px}th:nth-child(4),td:nth-child(4){width:250px}th:nth-child(5),td:nth-child(5){width:112px}th:nth-child(6),td:nth-child(6){width:72px}th:nth-child(7),td:nth-child(7){width:88px}th:nth-child(8),td:nth-child(8){width:92px}th:nth-child(9),td:nth-child(9){width:142px}th:nth-child(10),td:nth-child(10){width:145px}th:nth-child(11),td:nth-child(11){width:78px}th:nth-child(12),td:nth-child(12){width:92px}th:nth-child(13),td:nth-child(13){width:190px}
+    table{border-collapse:collapse;width:100%;min-width:1640px;table-layout:fixed}th,td{padding:6px 7px;border-bottom:1px solid #edf0f4;text-align:left;vertical-align:middle;overflow-wrap:anywhere}tbody tr{transition:background-color .12s ease}tbody tr:hover{background:#eef6ff}tbody tr.dirtyRow:hover{background:#fff7d6}th{background:#eef3f8;font-size:10.5px;text-transform:uppercase;position:sticky;top:0;white-space:nowrap!important;overflow-wrap:normal!important;word-break:keep-all!important}.right{text-align:right}.asinStack{line-height:1.35;white-space:normal}.actions{display:flex;gap:4px;flex-wrap:nowrap;align-items:center}.actions button{padding:5px 7px;font-size:12px;white-space:nowrap}.cellInput,.cellSelect,.cellArea{width:100%;min-width:0;padding:4px 5px;border:1px solid transparent;border-radius:4px;background:transparent;color:inherit}.cellInput:hover,.cellSelect:hover,.cellArea:hover{border-color:#d8dee8;background:#fff}.cellInput:focus,.cellSelect:focus,.cellArea:focus{outline:none;border-color:#1769aa;background:#fff;box-shadow:0 0 0 2px #1769aa18}.cellInput.num{text-align:right}.cellArea{resize:vertical;min-height:28px;line-height:1.3}.subInput{margin-top:3px;font-size:11px;color:#53657a}.miniPair{display:grid;grid-template-columns:minmax(0,1fr) 64px;gap:4px;align-items:center}.dirtyRow{background:#fffdf2}.saveBtn{min-width:52px}th:nth-child(1),td:nth-child(1){width:82px}th:nth-child(2),td:nth-child(2){width:105px}th:nth-child(3),td:nth-child(3){width:92px}th:nth-child(4),td:nth-child(4){width:290px}th:nth-child(5),td:nth-child(5){width:120px}th:nth-child(6),td:nth-child(6){width:72px}th:nth-child(7),td:nth-child(7){width:88px}th:nth-child(8),td:nth-child(8){width:92px}th:nth-child(9),td:nth-child(9){width:190px}th:nth-child(10),td:nth-child(10){width:190px}th:nth-child(11),td:nth-child(11){width:82px}th:nth-child(12),td:nth-child(12){width:92px}th:nth-child(13),td:nth-child(13){width:205px}
     .hide{display:none!important}.ownerOnly{display:none}body.owner .ownerOnly{display:block}body.owner td.ownerOnly,body.owner th.ownerOnly{display:table-cell}
     .modal{position:fixed;inset:0;background:#0006;display:none;align-items:center;justify-content:center;padding:20px;z-index:20}.modal.open{display:flex}.modalbox{background:#fff;max-width:950px;width:100%;max-height:92vh;overflow:auto;border-radius:12px;padding:18px}
     .section{font-weight:700;margin:15px 0 8px;padding-bottom:5px;border-bottom:1px solid #e5e7eb}.measurement-note{background:#eef6ff;border-left:4px solid var(--blue);padding:10px;margin-top:10px}.danger{color:#a11}
@@ -78,12 +78,30 @@ const money=v=>v==null||v===""?"":Number(v).toLocaleString(undefined,{style:"cur
 const fmt=v=>v==null||v===""?"—":Number(v).toLocaleString();
 const asinCell=v=>{const a=String(v||"").split(",").map(x=>x.trim()).filter(Boolean);return a.length?a.map(x=>`<div>${esc(x)}</div>`).join(""):"—"};
 const raw=v=>v==null?"":String(v);
-function inlineCell(r,field,value,type="text"){
-  if(r.pallet_status!=="active")return esc(value??"—");
+const inputHtml=(field,value,type="text",editable=true,extra="")=>{
+  if(!editable)return esc(value??"—");
   const cls=type==="number"?"cellInput num":"cellInput";
   const step=type==="number"?' step="any" min="0"':"";
-  return `<input class="${cls}" data-field="${field}" type="${type}"${step} value="${esc(raw(value))}">`;
-}
+  return `<input class="${cls}" data-field="${field}" type="${type}"${step} value="${esc(raw(value))}" ${extra}>`;
+};
+const areaHtml=(field,value,editable=true)=>{
+  if(!editable)return `<div class="asinStack">${asinCell(value)}</div>`;
+  const display=String(value||"").split(",").map(x=>x.trim()).filter(Boolean).join("\n");
+  return `<textarea class="cellArea" data-field="${field}" rows="1">${esc(display)}</textarea>`;
+};
+const statusHtml=(r,editable)=>{
+  if(!editable)return esc(r.pallet_status);
+  return `<select class="cellSelect" data-field="status">${["active","depleted","missing","archived"].map(s=>`<option value="${s}" ${s===r.pallet_status?"selected":""}>${s}</option>`).join("")}</select>`;
+};
+const measurementEditHtml=(r,editable)=>{
+  if(!editable)return measurementCell(r);
+  const am=[r.amazon_item_dimensions,r.amazon_item_weight_lb?`${r.amazon_item_weight_lb} lb`:""].filter(Boolean).join(" · ");
+  return `<div class="miniPair">${inputHtml("item_dims",r.warehouse_item_dimensions||"","text",true,'placeholder="LxWxH"')}${inputHtml("item_weight",r.warehouse_item_weight_lb,"number",true,'placeholder="lb"')}</div>${am?`<div class="muted">Amazon: ${esc(am)}</div>`:""}${r.dimension_alert?`<div class="warn">⚠ ${esc(r.dimension_alert)}</div>`:""}`;
+};
+const cartonEditHtml=(r,editable)=>{
+  if(!editable)return caseCell(r);
+  return `<div class="miniPair">${inputHtml("case_dims",r.casepack_box_dimensions||"","text",true,'placeholder="LxWxH"')}${inputHtml("case_weight",r.casepack_box_weight_lb,"number",true,'placeholder="lb"')}</div>`;
+};
 const close=id=>$("#"+id).classList.remove("open");document.querySelectorAll("[data-close]").forEach(b=>b.onclick=()=>close(b.dataset.close));
 async function getRole(){const {data}=await sb.rpc("get_my_role");return data}
 async function enter(){const {data:{session}}=await sb.auth.getSession();if(!session)return;$("#authCard").classList.add("hide");$("#app").classList.remove("hide");$("#logout").classList.remove("hide");role=await getRole();if(!role){$("#unassigned").classList.remove("hide");$("#addBtn").disabled=true;$("#search").disabled=true;return}document.body.classList.toggle("owner",role==="owner");$("#roleBadge").textContent=role.toUpperCase();await load("")}
@@ -99,28 +117,31 @@ async function load(q){
   if(error){$("#tbody").innerHTML=`<tr><td colspan="13">${esc(error.message)}</td></tr>`;return}
   current=data||[];
   $("#tbody").innerHTML=current.map(r=>{
-    const editable=r.pallet_status==="active";
-    const costCell=role==="owner"
-      ? (editable?inlineCell(r,"cost",r.cost_per_unit,"number"):money(r.cost_per_unit))
-      : "";
+    const owner=role==="owner";
+    const operational=owner||r.pallet_status==="active";
+    const productCell=owner
+      ? `${inputHtml("title",r.title,"text",true)}<input class="cellInput subInput" data-field="identifiers" value="${esc(raw(r.identifiers||""))}" placeholder="upc:... · fnsku:... · item_number:...">`
+      : `<b>${esc(r.title)}</b><div class="muted">${esc(r.identifiers||"")}</div>`;
+    const palletCell=owner?inputHtml("pallet",r.pallet_number,"number",true):`<b>${r.pallet_number}</b>`;
+    const costCell=owner?inputHtml("cost",r.cost_per_unit,"number",true):"";
     return `<tr data-line="${r.line_id}">
-      <td><b>${r.pallet_number}</b></td>
-      <td>${inlineCell(r,"location",r.location||"")}</td>
-      <td>${esc(r.pallet_status)}</td>
-      <td><b>${esc(r.title)}</b><div class="muted">${esc(r.identifiers||"")}</div></td>
-      <td><div class="asinStack">${asinCell(r.asins)}</div></td>
-      <td>${inlineCell(r,"cases",r.cases,"number")}</td>
-      <td>${inlineCell(r,"casepack",r.casepack,"number")}</td>
-      <td>${inlineCell(r,"available",r.available_units,"number")}</td>
-      <td>${measurementCell(r)}</td>
-      <td>${caseCell(r)}</td>
+      <td>${palletCell}</td>
+      <td>${inputHtml("location",r.location||"","text",operational)}</td>
+      <td>${statusHtml(r,owner)}</td>
+      <td>${productCell}</td>
+      <td>${areaHtml("asins",r.asins,owner)}</td>
+      <td>${inputHtml("cases",r.cases,"number",operational)}</td>
+      <td>${inputHtml("casepack",r.casepack,"number",operational)}</td>
+      <td>${inputHtml("available",r.available_units,"number",operational)}</td>
+      <td>${measurementEditHtml(r,operational)}</td>
+      <td>${cartonEditHtml(r,operational)}</td>
       <td class="ownerOnly">${costCell}</td>
       <td class="ownerOnly right">${money(r.inventory_value)}</td>
       <td><div class="actions">
-        ${editable?`<button class="primary saveBtn" data-save="${r.line_id}">Save</button>`:""}
+        ${operational?`<button class="primary saveBtn" data-save="${r.line_id}">Save</button>`:""}
         <button data-dup="${r.line_id}" data-title="${esc(r.title)}">Duplicate</button>
         <button data-hist="${r.pallet_id}">History</button>
-        ${r.pallet_status!=="active"?`<button data-react="${r.pallet_id}" data-line="${r.line_id}" data-title="${esc(r.title)}">Reactivate</button>`:""}
+        ${r.pallet_status!=="active"&&!owner?`<button data-react="${r.pallet_id}" data-line="${r.line_id}" data-title="${esc(r.title)}">Reactivate</button>`:""}
       </div></td>
     </tr>`;
   }).join("");
@@ -131,24 +152,39 @@ function bindRows(){
   document.querySelectorAll("[data-dup]").forEach(b=>b.onclick=()=>duplicateLine(b.dataset.dup,b.dataset.title));
   document.querySelectorAll("[data-hist]").forEach(b=>b.onclick=()=>history(b.dataset.hist));
   document.querySelectorAll("[data-react]").forEach(b=>b.onclick=()=>reactivate(b.dataset.react,b.dataset.line,b.dataset.title));
-  document.querySelectorAll(".cellInput").forEach(inp=>inp.addEventListener("input",()=>inp.closest("tr")?.classList.add("dirtyRow")));
+  document.querySelectorAll(".cellInput,.cellSelect,.cellArea").forEach(inp=>inp.addEventListener("input",()=>inp.closest("tr")?.classList.add("dirtyRow")));
 }
 async function saveInlineRow(line){
   const tr=document.querySelector(`tr[data-line="${line}"]`);
-  if(!tr)return;
-  const val=f=>tr.querySelector(`[data-field="${f}"]`)?.value?.trim()??"";
+  const r=current.find(x=>Number(x.line_id)===Number(line));
+  if(!tr||!r)return;
+  const val=f=>{
+    const el=tr.querySelector(`[data-field="${f}"]`);
+    return el?el.value.trim():null;
+  };
+  const num=(s,fallback=null)=>s==null?fallback:(s===""?null:Number(s));
+  const owner=role==="owner";
   const btn=tr.querySelector("[data-save]");
-  const cases=val("cases"),casepack=val("casepack"),available=val("available"),cost=val("cost");
   const args={
     p_line_id:Number(line),
-    p_location:val("location"),
-    p_cases:cases===""?null:Number(cases),
-    p_casepack:casepack===""?null:Number(casepack),
-    p_available_units:available===""?null:Number(available),
-    p_cost_per_unit:role==="owner"?(cost===""?null:Number(cost)):null
+    p_pallet_number:owner?Number(val("pallet")):Number(r.pallet_number),
+    p_status:owner?val("status"):r.pallet_status,
+    p_location:val("location")??r.location,
+    p_title:owner?val("title"):r.title,
+    p_identifiers_text:owner?(val("identifiers")??""):(r.identifiers||""),
+    p_asins_text:owner?(val("asins")??""):(r.asins||""),
+    p_cases:num(val("cases"),r.cases),
+    p_casepack:num(val("casepack"),r.casepack),
+    p_available_units:num(val("available"),r.available_units),
+    p_item_dimensions:val("item_dims")??(r.warehouse_item_dimensions||""),
+    p_item_weight_lb:num(val("item_weight"),r.warehouse_item_weight_lb),
+    p_case_box_dimensions:val("case_dims")??(r.casepack_box_dimensions||""),
+    p_case_box_weight_lb:num(val("case_weight"),r.casepack_box_weight_lb),
+    p_cost_per_unit:owner?num(val("cost"),r.cost_per_unit):null
   };
+  if(!Number.isFinite(args.p_pallet_number)){alert("Enter a valid pallet number.");return}
   btn.disabled=true;btn.textContent="Saving…";
-  const {error}=await sb.rpc("save_inventory_row",args);
+  const {error}=await sb.rpc("save_inventory_row_v2",args);
   if(error){btn.disabled=false;btn.textContent="Save";alert(error.message);return}
   await load($("#search").value);
 }
