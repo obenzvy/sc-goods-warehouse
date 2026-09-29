@@ -13,7 +13,8 @@
     label{display:block;font-size:12px;font-weight:700;margin-bottom:4px;color:#53657a}input,select,button{font:inherit;padding:9px;border:1px solid #cbd5e1;border-radius:7px}input,select{width:100%}button{cursor:pointer;background:#fff}.primary{background:var(--blue);color:#fff;border-color:var(--blue)}
     .muted{color:var(--muted);font-size:12px}.warn{color:var(--warn);font-weight:700}.good{color:var(--ok);font-weight:700}.row{display:flex;gap:8px;align-items:center}.pill{background:#eef2f7;color:#243a53;padding:3px 7px;border-radius:999px;font-size:11px}
     .toolbar{display:flex;gap:8px;align-items:center;margin-bottom:10px}.toolbar input{flex:1}.tablewrap{overflow:auto;border:1px solid var(--line);border-radius:10px;background:#fff}
-    table{border-collapse:collapse;width:100%;min-width:1640px;table-layout:fixed}th,td{padding:6px 7px;border-bottom:1px solid #edf0f4;text-align:left;vertical-align:middle;overflow-wrap:anywhere}tbody tr{transition:background-color .12s ease}tbody tr:hover{background:#eef6ff}tbody tr.dirtyRow:hover{background:#fff7d6}th{background:#eef3f8;font-size:10.5px;text-transform:uppercase;position:sticky;top:0;white-space:nowrap!important;overflow-wrap:normal!important;word-break:keep-all!important}.right{text-align:right}.asinStack{line-height:1.35;white-space:normal}.actions{display:flex;gap:4px;flex-wrap:nowrap;align-items:center}.actions button{padding:5px 7px;font-size:12px;white-space:nowrap}.cellInput,.cellSelect,.cellArea{width:100%;min-width:0;padding:4px 5px;border:1px solid transparent;border-radius:4px;background:transparent;color:inherit}.cellInput:hover,.cellSelect:hover,.cellArea:hover{border-color:#d8dee8;background:#fff}.cellInput:focus,.cellSelect:focus,.cellArea:focus{outline:none;border-color:#1769aa;background:#fff;box-shadow:0 0 0 2px #1769aa18}.cellInput.num{text-align:right}.cellArea{resize:vertical;min-height:28px;line-height:1.3}.subInput{margin-top:3px;font-size:11px;color:#53657a}.miniPair{display:grid;grid-template-columns:minmax(0,1fr) 64px;gap:4px;align-items:center}.dirtyRow{background:#fffdf2}.saveBtn{min-width:52px}th:nth-child(1),td:nth-child(1){width:82px}th:nth-child(2),td:nth-child(2){width:105px}th:nth-child(3),td:nth-child(3){width:92px}th:nth-child(4),td:nth-child(4){width:290px}th:nth-child(5),td:nth-child(5){width:120px}th:nth-child(6),td:nth-child(6){width:72px}th:nth-child(7),td:nth-child(7){width:88px}th:nth-child(8),td:nth-child(8){width:92px}th:nth-child(9),td:nth-child(9){width:190px}th:nth-child(10),td:nth-child(10){width:190px}th:nth-child(11),td:nth-child(11){width:82px}th:nth-child(12),td:nth-child(12){width:92px}th:nth-child(13),td:nth-child(13){width:205px}
+    table{border-collapse:collapse;width:100%;table-layout:fixed}th,td{padding:5px 5px;border-bottom:1px solid #edf0f4;text-align:left;vertical-align:middle;overflow:hidden;text-overflow:ellipsis}tbody tr{transition:background-color .1s ease}tbody tr:hover{background:#eef6ff}tbody tr.selectedRow{background:#dfeeff}tbody tr.dirtyRow{background:#fff7d6}tbody tr.dirtyRow:hover{background:#fff1bd}th{background:#eef3f8;font-size:10px;text-transform:uppercase;position:sticky;top:0;white-space:nowrap;overflow:visible;text-overflow:clip}.sortable{cursor:pointer;user-select:none}.sortable:hover{background:#e1eaf4}.sortArrow{font-size:9px;margin-left:2px}.right{text-align:right}.asinStack{line-height:1.25;white-space:normal;overflow-wrap:anywhere}.actions{display:flex;gap:3px;flex-wrap:wrap;align-items:center}.actions button{padding:4px 5px;font-size:11px;white-space:nowrap}.displayCell{display:block;min-height:23px;padding:3px 3px;border-radius:4px;white-space:normal;overflow-wrap:anywhere}.displayCell.editable{cursor:default}.displaySub{font-size:10px;color:#65758b;line-height:1.2;margin-top:2px}.cellInput,.cellSelect,.cellArea{width:100%;min-width:0;padding:4px 5px;border:1px solid #1769aa;border-radius:4px;background:#fff;color:inherit}.cellInput:focus,.cellSelect:focus,.cellArea:focus{outline:none;box-shadow:0 0 0 2px #1769aa18}.cellInput.num{text-align:right}.cellArea{resize:vertical;min-height:34px;line-height:1.2}.editPair{display:grid;grid-template-columns:minmax(0,1fr) 52px;gap:3px;align-items:center}.weightBox{display:flex;align-items:center;gap:2px}.weightBox .cellInput{min-width:0}.weightSuffix{font-size:10px;color:#65758b;white-space:nowrap}.costEdit{display:flex;align-items:center;gap:2px}.costPrefix{font-weight:700}.dirtyRow{background:#fff7d6}.saveBtn{min-width:46px}
+th:nth-child(1),td:nth-child(1){width:4.5%}th:nth-child(2),td:nth-child(2){width:6%}th:nth-child(3),td:nth-child(3){width:5.5%}th:nth-child(4),td:nth-child(4){width:18%}th:nth-child(5),td:nth-child(5){width:7%}th:nth-child(6),td:nth-child(6){width:4.5%}th:nth-child(7),td:nth-child(7){width:5.5%}th:nth-child(8),td:nth-child(8){width:6%}th:nth-child(9),td:nth-child(9){width:8.5%}th:nth-child(10),td:nth-child(10){width:8.5%}th:nth-child(11),td:nth-child(11){width:5%}th:nth-child(12),td:nth-child(12){width:6%}th:nth-child(13),td:nth-child(13){width:15%}
     .hide{display:none!important}.ownerOnly{display:none}body.owner .ownerOnly{display:block}body.owner td.ownerOnly,body.owner th.ownerOnly{display:table-cell}
     .modal{position:fixed;inset:0;background:#0006;display:none;align-items:center;justify-content:center;padding:20px;z-index:20}.modal.open{display:flex}.modalbox{background:#fff;max-width:950px;width:100%;max-height:92vh;overflow:auto;border-radius:12px;padding:18px}
     .section{font-weight:700;margin:15px 0 8px;padding-bottom:5px;border-bottom:1px solid #e5e7eb}.measurement-note{background:#eef6ff;border-left:4px solid var(--blue);padding:10px;margin-top:10px}.danger{color:#a11}
@@ -33,10 +34,21 @@
   <div id="app" class="hide">
     <div id="unassigned" class="card hide"><b>This account is signed in but has not been assigned an Owner or Warehouse role yet.</b><p class="muted">Role assignment only needs to be done once.</p></div>
 
-    <div class="toolbar"><button id="addBtn" class="primary">+ Add Pallet</button><input id="search" placeholder="Search UPC, FNSKU, item #, ASIN, pallet, location or title"><button id="refresh">Refresh</button></div>
+    <div class="toolbar"><button id="addBtn" class="primary">+ Add Pallet</button><input id="search" placeholder="Search UPC, FNSKU, item #, ASIN, pallet, location or title"><button id="exportBtn">Export CSV</button><button id="refresh">Refresh</button></div>
     <div class="tablewrap"><table><thead><tr>
-      <th>Pallet</th><th>Location</th><th>Status</th><th>Product</th><th>ASIN</th><th>Cases</th><th>Casepack</th><th>Available</th>
-      <th>Item measurement</th><th>Casepack carton</th><th class="ownerOnly">Cost</th><th class="ownerOnly">Value</th><th>Actions</th>
+      <th class="sortable" data-sort="pallet_number">Pallet <span class="sortArrow"></span></th>
+      <th class="sortable" data-sort="location">Location <span class="sortArrow"></span></th>
+      <th class="sortable" data-sort="pallet_status">Status <span class="sortArrow"></span></th>
+      <th class="sortable" data-sort="title">Product <span class="sortArrow"></span></th>
+      <th class="sortable" data-sort="asins">ASIN <span class="sortArrow"></span></th>
+      <th class="sortable" data-sort="cases">Cases <span class="sortArrow"></span></th>
+      <th class="sortable" data-sort="casepack">Casepack <span class="sortArrow"></span></th>
+      <th class="sortable" data-sort="available_units">Available <span class="sortArrow"></span></th>
+      <th class="sortable" data-sort="warehouse_item_dimensions">Item measurement <span class="sortArrow"></span></th>
+      <th class="sortable" data-sort="casepack_box_dimensions">Casepack carton <span class="sortArrow"></span></th>
+      <th class="ownerOnly sortable" data-sort="cost_per_unit">Cost <span class="sortArrow"></span></th>
+      <th class="ownerOnly sortable" data-sort="inventory_value">Value <span class="sortArrow"></span></th>
+      <th>Actions</th>
     </tr></thead><tbody id="tbody"></tbody></table></div>
   </div>
 </div>
@@ -72,36 +84,64 @@ const SUPABASE_URL="https://szgmxhfnajerpoxqutbk.supabase.co";
 const SUPABASE_KEY="sb_publishable_VAfTygDeLYFs5GPautNYzw_wawiklS4";
 const sb=createClient(SUPABASE_URL,SUPABASE_KEY);
 const PORTAL_URL="https://obenzvy.github.io/sc-goods-warehouse/";
-const $=s=>document.querySelector(s); let role=null,selectedProduct=null,current=[];
+const $=s=>document.querySelector(s); let role=null,selectedProduct=null,current=[],sortKey="pallet_number",sortDir=-1;
 const esc=v=>String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
-const money=v=>v==null||v===""?"":Number(v).toLocaleString(undefined,{style:"currency",currency:"USD"});
+const money=v=>v==null||v===""?"—":Number(v).toLocaleString(undefined,{style:"currency",currency:"USD"});
 const fmt=v=>v==null||v===""?"—":Number(v).toLocaleString();
-const asinCell=v=>{const a=String(v||"").split(",").map(x=>x.trim()).filter(Boolean);return a.length?a.map(x=>`<div>${esc(x)}</div>`).join(""):"—"};
 const raw=v=>v==null?"":String(v);
-const inputHtml=(field,value,type="text",editable=true,extra="")=>{
-  if(!editable)return esc(value??"—");
-  const cls=type==="number"?"cellInput num":"cellInput";
-  const step=type==="number"?' step="any" min="0"':"";
-  return `<input class="${cls}" data-field="${field}" type="${type}"${step} value="${esc(raw(value))}" ${extra}>`;
-};
-const areaHtml=(field,value,editable=true)=>{
-  if(!editable)return `<div class="asinStack">${asinCell(value)}</div>`;
-  const display=String(value||"").split(",").map(x=>x.trim()).filter(Boolean).join("\n");
-  return `<textarea class="cellArea" data-field="${field}" rows="1">${esc(display)}</textarea>`;
-};
-const statusHtml=(r,editable)=>{
-  if(!editable)return esc(r.pallet_status);
-  return `<select class="cellSelect" data-field="status">${["active","depleted","missing","archived"].map(s=>`<option value="${s}" ${s===r.pallet_status?"selected":""}>${s}</option>`).join("")}</select>`;
-};
-const measurementEditHtml=(r,editable)=>{
-  if(!editable)return measurementCell(r);
-  const am=[r.amazon_item_dimensions,r.amazon_item_weight_lb?`${r.amazon_item_weight_lb} lb`:""].filter(Boolean).join(" · ");
-  return `<div class="miniPair">${inputHtml("item_dims",r.warehouse_item_dimensions||"","text",true,'placeholder="LxWxH"')}${inputHtml("item_weight",r.warehouse_item_weight_lb,"number",true,'placeholder="lb"')}</div>${am?`<div class="muted">Amazon: ${esc(am)}</div>`:""}${r.dimension_alert?`<div class="warn">⚠ ${esc(r.dimension_alert)}</div>`:""}`;
-};
-const cartonEditHtml=(r,editable)=>{
-  if(!editable)return caseCell(r);
-  return `<div class="miniPair">${inputHtml("case_dims",r.casepack_box_dimensions||"","text",true,'placeholder="LxWxH"')}${inputHtml("case_weight",r.casepack_box_weight_lb,"number",true,'placeholder="lb"')}</div>`;
-};
+const asins=v=>String(v||"").split(",").map(x=>x.trim()).filter(Boolean);
+const asinDisplay=v=>{const a=asins(v);return a.length?a.map(x=>`<div>${esc(x)}</div>`).join(""):"—"};
+const display=(html,field,editable=true)=>`<div class="displayCell${editable?" editable":""}" data-edit-field="${field}">${html}</div>`;
+const numInput=(field,value)=>`<input class="cellInput num" data-field="${field}" type="number" step="any" min="0" value="${esc(raw(value))}">`;
+const textInput=(field,value)=>`<input class="cellInput" data-field="${field}" type="text" value="${esc(raw(value))}">`;
+const weightInput=(field,value)=>`<div class="weightBox">${numInput(field,value)}<span class="weightSuffix">lbs</span></div>`;
+function measurementText(r){
+  const wh=[r.warehouse_item_dimensions,r.warehouse_item_weight_lb!=null&&r.warehouse_item_weight_lb!==""?`${r.warehouse_item_weight_lb} lbs`:""].filter(Boolean).join(" · ");
+  const am=[r.amazon_item_dimensions,r.amazon_item_weight_lb!=null&&r.amazon_item_weight_lb!==""?`${r.amazon_item_weight_lb} lbs`:""].filter(Boolean).join(" · ");
+  return `${esc(wh||"—")}${am?`<div class="displaySub">Amazon: ${esc(am)}</div>`:""}${r.dimension_alert?`<div class="warn">⚠ ${esc(r.dimension_alert)}</div>`:""}`;
+}
+function cartonText(r){
+  const wh=[r.casepack_box_dimensions,r.casepack_box_weight_lb!=null&&r.casepack_box_weight_lb!==""?`${r.casepack_box_weight_lb} lbs`:""].filter(Boolean).join(" · ");
+  return esc(wh||"—");
+}
+function editCell(td,r,field){
+  if(td.querySelector("input,select,textarea"))return;
+  const owner=role==="owner";
+  const operational=owner||r.pallet_status==="active";
+  let html="";
+  if(field==="pallet"){if(!owner)return;html=numInput("pallet",r.pallet_number)}
+  else if(field==="location"){if(!operational)return;html=textInput("location",r.location||"")}
+  else if(field==="status"){if(!owner)return;html=`<select class="cellSelect" data-field="status">${["active","depleted","missing","archived"].map(s=>`<option value="${s}" ${s===r.pallet_status?"selected":""}>${s}</option>`).join("")}</select>`}
+  else if(field==="product"){if(!owner)return;html=`${textInput("title",r.title)}<input class="cellInput" style="margin-top:3px;font-size:10px" data-field="identifiers" value="${esc(raw(r.identifiers||""))}" placeholder="upc:... · fnsku:... · item_number:...">`}
+  else if(field==="asins"){if(!owner)return;html=`<textarea class="cellArea" data-field="asins" rows="2">${esc(asins(r.asins).join("\n"))}</textarea>`}
+  else if(field==="cases"){if(!operational)return;html=numInput("cases",r.cases)}
+  else if(field==="casepack"){if(!operational)return;html=numInput("casepack",r.casepack)}
+  else if(field==="available"){if(!operational)return;html=numInput("available",r.available_units)}
+  else if(field==="itemmeasurement"){if(!operational)return;html=`<div class="editPair">${textInput("item_dims",r.warehouse_item_dimensions||"")}${weightInput("item_weight",r.warehouse_item_weight_lb)}</div>`}
+  else if(field==="casecarton"){if(!operational)return;html=`<div class="editPair">${textInput("case_dims",r.casepack_box_dimensions||"")}${weightInput("case_weight",r.casepack_box_weight_lb)}</div>`}
+  else if(field==="cost"){if(!owner)return;html=`<div class="costEdit"><span class="costPrefix">$</span>${numInput("cost",r.cost_per_unit)}</div>`}
+  else return;
+  td.innerHTML=html;
+  td.closest("tr")?.classList.add("dirtyRow");
+  const first=td.querySelector("input,select,textarea");if(first){first.focus();if(first.select)first.select()}
+}
+function sortValue(r,key){
+  if(["pallet_number","cases","casepack","available_units","cost_per_unit","inventory_value"].includes(key))return Number(r[key]??-Infinity);
+  return String(r[key]??"").toLowerCase();
+}
+function sortedRows(){
+  return [...current].sort((a,b)=>{
+    const av=sortValue(a,sortKey),bv=sortValue(b,sortKey);
+    if(av===bv)return Number(a.pallet_number)-Number(b.pallet_number);
+    return (av>bv?1:-1)*sortDir;
+  });
+}
+function updateSortIndicators(){
+  document.querySelectorAll("th[data-sort]").forEach(th=>{
+    const s=th.querySelector(".sortArrow");
+    if(s)s.textContent=th.dataset.sort===sortKey?(sortDir===1?"▲":"▼"):"";
+  });
+}
 const close=id=>$("#"+id).classList.remove("open");document.querySelectorAll("[data-close]").forEach(b=>b.onclick=()=>close(b.dataset.close));
 async function getRole(){const {data}=await sb.rpc("get_my_role");return data}
 async function enter(){const {data:{session}}=await sb.auth.getSession();if(!session)return;$("#authCard").classList.add("hide");$("#app").classList.remove("hide");$("#logout").classList.remove("hide");role=await getRole();if(!role){$("#unassigned").classList.remove("hide");$("#addBtn").disabled=true;$("#search").disabled=true;return}document.body.classList.toggle("owner",role==="owner");$("#roleBadge").textContent=role.toUpperCase();await load("")}
@@ -109,33 +149,30 @@ $("#signin").onclick=async()=>{const {error}=await sb.auth.signInWithPassword({e
 $("#signup").onclick=async()=>{const email=$("#email").value.trim();const password=$("#password").value;const {error}=await sb.auth.signUp({email,password,options:{emailRedirectTo:PORTAL_URL}});$("#authMsg").textContent=error?error.message:"Account created. Check your email and click the confirmation link. It will return you to this warehouse portal."}
 $("#resend").onclick=async()=>{const email=$("#email").value.trim();if(!email){$("#authMsg").textContent="Enter your email first.";return}const {error}=await sb.auth.resend({type:"signup",email,options:{emailRedirectTo:PORTAL_URL}});$("#authMsg").textContent=error?error.message:"Confirmation email resent. Use the newest email; older confirmation links can expire."}
 $("#logout").onclick=async()=>{await sb.auth.signOut();location.reload()}
-function measurementCell(r){const wh=[r.warehouse_item_dimensions,r.warehouse_item_weight_lb?`${r.warehouse_item_weight_lb} lb`:""].filter(Boolean).join(" · ");const am=[r.amazon_item_dimensions,r.amazon_item_weight_lb?`${r.amazon_item_weight_lb} lb`:""].filter(Boolean).join(" · ");return `${esc(wh||"—")}${am?`<div class="muted">Amazon: ${esc(am)}</div>`:""}${r.dimension_alert?`<div class="warn">⚠ ${esc(r.dimension_alert)}</div>`:""}`}
-function caseCell(r){return `${esc(r.casepack_box_dimensions||"—")}${r.casepack_box_weight_lb?` · ${esc(r.casepack_box_weight_lb)} lb`:""}`}
 async function load(q){
   const fn=role==="owner"?"owner_portal_inventory_search":"portal_inventory_search";
   const {data,error}=await sb.rpc(fn,{p_query:q||""});
   if(error){$("#tbody").innerHTML=`<tr><td colspan="13">${esc(error.message)}</td></tr>`;return}
   current=data||[];
-  $("#tbody").innerHTML=current.map(r=>{
-    const owner=role==="owner";
+  renderRows();
+}
+function renderRows(){
+  const owner=role==="owner";
+  $("#tbody").innerHTML=sortedRows().map(r=>{
     const operational=owner||r.pallet_status==="active";
-    const productCell=owner
-      ? `${inputHtml("title",r.title,"text",true)}<input class="cellInput subInput" data-field="identifiers" value="${esc(raw(r.identifiers||""))}" placeholder="upc:... · fnsku:... · item_number:...">`
-      : `<b>${esc(r.title)}</b><div class="muted">${esc(r.identifiers||"")}</div>`;
-    const palletCell=owner?inputHtml("pallet",r.pallet_number,"number",true):`<b>${r.pallet_number}</b>`;
-    const costCell=owner?inputHtml("cost",r.cost_per_unit,"number",true):"";
+    const productHtml=`<b>${esc(r.title)}</b><div class="displaySub">${esc(r.identifiers||"")}</div>`;
     return `<tr data-line="${r.line_id}">
-      <td>${palletCell}</td>
-      <td>${inputHtml("location",r.location||"","text",operational)}</td>
-      <td>${statusHtml(r,owner)}</td>
-      <td>${productCell}</td>
-      <td>${areaHtml("asins",r.asins,owner)}</td>
-      <td>${inputHtml("cases",r.cases,"number",operational)}</td>
-      <td>${inputHtml("casepack",r.casepack,"number",operational)}</td>
-      <td>${inputHtml("available",r.available_units,"number",operational)}</td>
-      <td>${measurementEditHtml(r,operational)}</td>
-      <td>${cartonEditHtml(r,operational)}</td>
-      <td class="ownerOnly">${costCell}</td>
+      <td data-edit-field="pallet">${display(`<b>${esc(r.pallet_number)}</b>`,"pallet",owner)}</td>
+      <td data-edit-field="location">${display(esc(r.location||"—"),"location",operational)}</td>
+      <td data-edit-field="status">${display(esc(r.pallet_status),"status",owner)}</td>
+      <td data-edit-field="product">${display(productHtml,"product",owner)}</td>
+      <td data-edit-field="asins">${display(`<div class="asinStack">${asinDisplay(r.asins)}</div>`,"asins",owner)}</td>
+      <td data-edit-field="cases" class="right">${display(fmt(r.cases),"cases",operational)}</td>
+      <td data-edit-field="casepack" class="right">${display(fmt(r.casepack),"casepack",operational)}</td>
+      <td data-edit-field="available" class="right">${display(`<b>${fmt(r.available_units)}</b>`,"available",operational)}</td>
+      <td data-edit-field="itemmeasurement">${display(measurementText(r),"itemmeasurement",operational)}</td>
+      <td data-edit-field="casecarton">${display(cartonText(r),"casecarton",operational)}</td>
+      <td data-edit-field="cost" class="ownerOnly right">${display(money(r.cost_per_unit),"cost",owner)}</td>
       <td class="ownerOnly right">${money(r.inventory_value)}</td>
       <td><div class="actions">
         ${operational?`<button class="primary saveBtn" data-save="${r.line_id}">Save</button>`:""}
@@ -146,8 +183,24 @@ async function load(q){
     </tr>`;
   }).join("");
   bindRows();
+  updateSortIndicators();
 }
 function bindRows(){
+  document.querySelectorAll("#tbody tr").forEach(tr=>{
+    tr.addEventListener("click",e=>{
+      if(e.target.closest("button,input,select,textarea"))return;
+      document.querySelectorAll("#tbody tr.selectedRow").forEach(x=>x.classList.remove("selectedRow"));
+      tr.classList.add("selectedRow");
+    });
+  });
+  document.querySelectorAll("#tbody td[data-edit-field]").forEach(td=>{
+    td.addEventListener("dblclick",e=>{
+      if(e.target.closest("input,select,textarea"))return;
+      const tr=td.closest("tr");
+      const r=current.find(x=>Number(x.line_id)===Number(tr?.dataset.line));
+      if(r)editCell(td,r,td.dataset.editField);
+    });
+  });
   document.querySelectorAll("[data-save]").forEach(b=>b.onclick=()=>saveInlineRow(b.dataset.save));
   document.querySelectorAll("[data-dup]").forEach(b=>b.onclick=()=>duplicateLine(b.dataset.dup,b.dataset.title));
   document.querySelectorAll("[data-hist]").forEach(b=>b.onclick=()=>history(b.dataset.hist));
@@ -158,29 +211,29 @@ async function saveInlineRow(line){
   const tr=document.querySelector(`tr[data-line="${line}"]`);
   const r=current.find(x=>Number(x.line_id)===Number(line));
   if(!tr||!r)return;
-  const val=f=>{
+  const val=(f,fallback)=>{
     const el=tr.querySelector(`[data-field="${f}"]`);
-    return el?el.value.trim():null;
+    return el?el.value.trim():fallback;
   };
   const num=(s,fallback=null)=>s==null?fallback:(s===""?null:Number(s));
   const owner=role==="owner";
   const btn=tr.querySelector("[data-save]");
   const args={
     p_line_id:Number(line),
-    p_pallet_number:owner?Number(val("pallet")):Number(r.pallet_number),
-    p_status:owner?val("status"):r.pallet_status,
-    p_location:val("location")??r.location,
-    p_title:owner?val("title"):r.title,
-    p_identifiers_text:owner?(val("identifiers")??""):(r.identifiers||""),
-    p_asins_text:owner?(val("asins")??""):(r.asins||""),
-    p_cases:num(val("cases"),r.cases),
-    p_casepack:num(val("casepack"),r.casepack),
-    p_available_units:num(val("available"),r.available_units),
-    p_item_dimensions:val("item_dims")??(r.warehouse_item_dimensions||""),
-    p_item_weight_lb:num(val("item_weight"),r.warehouse_item_weight_lb),
-    p_case_box_dimensions:val("case_dims")??(r.casepack_box_dimensions||""),
-    p_case_box_weight_lb:num(val("case_weight"),r.casepack_box_weight_lb),
-    p_cost_per_unit:owner?num(val("cost"),r.cost_per_unit):null
+    p_pallet_number:owner?Number(val("pallet",r.pallet_number)):Number(r.pallet_number),
+    p_status:owner?val("status",r.pallet_status):r.pallet_status,
+    p_location:val("location",r.location||""),
+    p_title:owner?val("title",r.title):r.title,
+    p_identifiers_text:owner?val("identifiers",r.identifiers||""):(r.identifiers||""),
+    p_asins_text:owner?val("asins",r.asins||""):(r.asins||""),
+    p_cases:num(val("cases",r.cases),r.cases),
+    p_casepack:num(val("casepack",r.casepack),r.casepack),
+    p_available_units:num(val("available",r.available_units),r.available_units),
+    p_item_dimensions:val("item_dims",r.warehouse_item_dimensions||""),
+    p_item_weight_lb:num(val("item_weight",r.warehouse_item_weight_lb),r.warehouse_item_weight_lb),
+    p_case_box_dimensions:val("case_dims",r.casepack_box_dimensions||""),
+    p_case_box_weight_lb:num(val("case_weight",r.casepack_box_weight_lb),r.casepack_box_weight_lb),
+    p_cost_per_unit:owner?num(val("cost",r.cost_per_unit),r.cost_per_unit):null
   };
   if(!Number.isFinite(args.p_pallet_number)){alert("Enter a valid pallet number.");return}
   btn.disabled=true;btn.textContent="Saving…";
@@ -188,6 +241,25 @@ async function saveInlineRow(line){
   if(error){btn.disabled=false;btn.textContent="Save";alert(error.message);return}
   await load($("#search").value);
 }
+document.querySelectorAll("th[data-sort]").forEach(th=>th.addEventListener("click",()=>{
+  const key=th.dataset.sort;
+  if(sortKey===key)sortDir*=-1;else{sortKey=key;sortDir=1}
+  renderRows();
+}));
+$("#exportBtn").onclick=()=>{
+  const rows=sortedRows();
+  const headers=["Pallet","Location","Status","Product","Identifiers","ASIN","Cases","Casepack","Available","Item Dimensions","Item Weight (lbs)","Casepack Carton Dimensions","Casepack Carton Weight (lbs)"];
+  if(role==="owner")headers.push("Cost","Value");
+  const csv=[headers];
+  rows.forEach(r=>{
+    const row=[r.pallet_number,r.location||"",r.pallet_status,r.title,r.identifiers||"",asins(r.asins).join(" | "),r.cases??"",r.casepack??"",r.available_units??"",r.warehouse_item_dimensions||"",r.warehouse_item_weight_lb??"",r.casepack_box_dimensions||"",r.casepack_box_weight_lb??""];
+    if(role==="owner")row.push(r.cost_per_unit??"",r.inventory_value??"");
+    csv.push(row);
+  });
+  const out=csv.map(row=>row.map(v=>`"${String(v??"").replaceAll('"','""')}"`).join(",")).join("\r\n");
+  const blob=new Blob([out],{type:"text/csv;charset=utf-8"});
+  const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=`SC_Goods_Warehouse_${new Date().toISOString().slice(0,10)}.csv`;a.click();URL.revokeObjectURL(a.href);
+};
 $("#search").oninput=e=>{clearTimeout(window._t);window._t=setTimeout(()=>load(e.target.value),250)};$("#refresh").onclick=()=>load($("#search").value);
 $("#addBtn").onclick=()=>{$("#addModal").classList.add("open");selectedProduct=null;$("#matches").innerHTML="";$("#matchMsg").textContent=""}
 $("#findProduct").onclick=async()=>{const {data,error}=await sb.rpc("find_product_candidates",{p_upc:$("#a_upc").value||null,p_fnsku:$("#a_fnsku").value||null,p_item_number:$("#a_item").value||null,p_asin:$("#a_asin")?.value||null,p_title:$("#a_title").value||null});if(error){$("#matchMsg").textContent=error.message;return}$("#matches").innerHTML=(data||[]).map(r=>`<div class="card"><b>${esc(r.title)}</b> <span class="muted">${esc(r.match_reason)}</span><div class="muted">${esc(r.identifiers)} ${esc(r.asins)}</div><button data-pick="${r.product_id}" data-title="${esc(r.title)}">Use Existing Product</button></div>`).join("")||'<span class="muted">No match. A new product will be created.</span>';document.querySelectorAll("[data-pick]").forEach(b=>b.onclick=()=>{selectedProduct=Number(b.dataset.pick);$("#a_title").value=b.dataset.title;$("#matches").innerHTML='<span class="good">Existing product selected.</span>'})}
