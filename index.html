@@ -92,7 +92,7 @@ const PORTAL_URL="https://obenzvy.github.io/sc-goods-warehouse/";
 const $=s=>document.querySelector(s); let role=null,selectedProduct=null,current=[],editLineId=null;
 const esc=v=>String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
 const money=v=>v==null||v===""?"":Number(v).toLocaleString(undefined,{style:"currency",currency:"USD"});
-const fmt=v=>Number(v||0).toLocaleString();
+const fmt=v=>v==null||v===""?"—":Number(v).toLocaleString();
 const asinCell=v=>{const a=String(v||"").split(",").map(x=>x.trim()).filter(Boolean);return a.length?a.map(x=>`<div>${esc(x)}</div>`).join(""):"—"};
 const close=id=>$("#"+id).classList.remove("open");document.querySelectorAll("[data-close]").forEach(b=>b.onclick=()=>close(b.dataset.close));
 async function getRole(){const {data}=await sb.rpc("get_my_role");return data}
@@ -137,8 +137,8 @@ $("#saveEdit").onclick=async()=>{
   const {error}=await sb.rpc("owner_update_inventory_line",{
     p_line_id:editLineId,
     p_location:$("#e_location").value,
-    p_cases:Number($("#e_cases").value),
-    p_casepack:Number($("#e_casepack").value),
+    p_cases:$("#e_cases").value.trim()===""?null:Number($("#e_cases").value),
+    p_casepack:$("#e_casepack").value.trim()===""?null:Number($("#e_casepack").value),
     p_physical_units:Number($("#e_units").value),
     p_cost_per_unit:costText===""?null:Number(costText),
     p_add_asin:$("#e_asin").value.trim()||null
