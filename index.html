@@ -53,14 +53,15 @@ th:nth-child(1),td:nth-child(1){width:4.5%}th:nth-child(2),td:nth-child(2){width
 </div>
 
 <div id="addModal" class="modal"><div class="modalbox">
-  <div class="row"><h2 style="flex:1">Add Pallet</h2><button data-close="addModal">✕</button></div>
+  <div class="row"><h2 id="addTitle" style="flex:1">Add Pallet</h2><button data-close="addModal">✕</button></div>
+  <p id="addTargetInfo" class="muted"></p>
   <div class="section">Identify product</div>
   <div class="grid"><div><label>UPC</label><input id="a_upc"></div><div><label>FNSKU</label><input id="a_fnsku"></div><div><label>Item #</label><input id="a_item"></div><div class="ownerOnly"><label>ASIN</label><input id="a_asin"></div></div>
   <div style="margin-top:8px"><label>Description</label><input id="a_title"></div>
   <div class="row" style="margin:10px 0"><button id="findProduct">Find Existing Product</button><span id="matchMsg" class="muted"></span></div><div id="matches"></div>
 
   <div class="section">Pallet</div>
-  <div class="grid"><div><label>Location *</label><input id="a_location"></div><div><label>Cases *</label><input id="a_cases" type="number" min="0"></div><div><label>Casepack *</label><input id="a_casepack" type="number" min="1"></div><div><label>Label status</label><select id="a_label"><option>Original UPC / unlabeled</option><option>FNSKU labeled</option></select></div></div>
+  <div class="grid"><div id="a_location_box"><label>Location *</label><input id="a_location"></div><div><label>Cases *</label><input id="a_cases" type="number" min="0"></div><div><label>Casepack *</label><input id="a_casepack" type="number" min="1"></div><div><label>Label status</label><select id="a_label"><option>Original UPC / unlabeled</option><option>FNSKU labeled</option></select></div></div>
   <p id="locWarn" class="warn"></p>
 
   <div class="section">Casepack carton — warehouse operations only</div>
@@ -90,6 +91,12 @@ const fmt=v=>v==null||v===""?"—":Number(v).toLocaleString();
 const raw=v=>v==null?"":String(v);
 const asins=v=>String(v||"").split(",").map(x=>x.trim()).filter(Boolean);
 const asinDisplay=v=>{const a=asins(v);return a.length?a.map(x=>`<div>${esc(x)}</div>`).join(""):"—"};
+// Units on hand beyond the full cases (after single-unit deductions), shown under the Cases value.
+const looseUnits=r=>{if(r.cases==null||r.casepack==null||r.physical_units==null)return"";const extra=Number(r.physical_units)-Number(r.cases)*Number(r.casepack);return Number.isFinite(extra)&&extra>0?`<div class="displaySub">+ ${fmt(extra)} units</div>`:""};
+// Whole-number field value, or null when blank or invalid.
+const wholeOrNull=s=>{const t=String(s??"").trim();if(t==="")return null;const n=Number(t);return Number.isSafeInteger(n)&&n>=0?n:null};
+const STALE="changed by someone else";
+let addTarget=null,savingPallet=false;
 const display=(html,field,editable=true)=>`<div class="displayCell${editable?" editable":""}" data-edit-field="${field}">${html}</div>`;
 const numInput=(field,value)=>`<input class="cellInput num" data-field="${field}" type="number" step="any" min="0" value="${esc(raw(value))}">`;
 const textInput=(field,value)=>`<input class="cellInput" data-field="${field}" type="text" value="${esc(raw(value))}">`;
@@ -204,7 +211,7 @@ $("#signup").onclick=async()=>{const email=$("#email").value.trim();const passwo
 $("#resend").onclick=async()=>{const email=$("#email").value.trim();if(!email){$("#authMsg").textContent="Enter your email first.";return}const {error}=await sb.auth.resend({type:"signup",email,options:{emailRedirectTo:PORTAL_URL}});$("#authMsg").textContent=error?error.message:"Confirmation email resent. Use the newest email; older confirmation links can expire."}
 $("#logout").onclick=async()=>{await sb.auth.signOut();location.reload()}
 async function load(q){
-  const fn=role==="owner"?"owner_portal_inventory_search_v2":"portal_inventory_search_v2";
+  const fn=role==="owner"?"owner_portal_inventory_search_v3":"portal_inventory_search_v3";
   const {data,error}=await sb.rpc(fn,{p_query:q||"",p_view:viewMode});
   if(error){$("#tbody").innerHTML=`<tr><td colspan="12">${esc(error.message)}</td></tr>`;return}
   current=data||[];
@@ -220,7 +227,7 @@ function renderRows(){
       <td data-edit-field="location">${display(esc(r.location||"—"),"location",operational)}</td>
       <td data-edit-field="product">${display(productHtml,"product",owner)}</td>
       <td data-edit-field="asins">${display(`<div class="asinStack">${asinDisplay(r.asins)}</div>`,"asins",owner)}</td>
-      <td data-edit-field="cases" class="right">${display(fmt(r.cases),"cases",operational)}</td>
+      <td data-edit-field="cases" class="right">${display(fmt(r.cases)+looseUnits(r),"cases",operational)}</td>
       <td data-edit-field="casepack" class="right">${display(fmt(r.casepack),"casepack",operational)}</td>
       <td data-edit-field="available" class="right">${display(`<b>${fmt(r.available_units)}</b>`,"available",operational)}</td>
       <td data-edit-field="itemmeasurement">${display(measurementText(r),"itemmeasurement",operational)}</td>
@@ -230,6 +237,7 @@ function renderRows(){
       <td><div class="actions">
         ${operational?`<button class="primary saveBtn" data-save="${r.line_id}">Save</button>`:""}
         <button data-dup="${r.line_id}" data-title="${esc(r.title)}">Duplicate</button>
+        ${r.pallet_status==="active"&&viewMode==="active"?`<button data-addline="${r.line_id}" title="Add another product to pallet ${esc(r.pallet_number)}">Add product</button>`:""}
         <button data-hist="${r.pallet_id}">History</button>
         ${r.pallet_status!=="active"&&!owner?`<button data-react="${r.pallet_id}" data-line="${r.line_id}" data-title="${esc(r.title)}">Reactivate</button>`:""}
       </div></td>
@@ -263,6 +271,7 @@ function bindRows(){
   });
   document.querySelectorAll("[data-save]").forEach(b=>b.onclick=()=>saveInlineRow(b.dataset.save));
   document.querySelectorAll("[data-dup]").forEach(b=>b.onclick=()=>duplicateLine(b.dataset.dup,b.dataset.title));
+  document.querySelectorAll("[data-addline]").forEach(b=>b.onclick=()=>openAdd(current.find(x=>Number(x.line_id)===Number(b.dataset.addline))));
   document.querySelectorAll("[data-hist]").forEach(b=>b.onclick=()=>history(b.dataset.hist));
   document.querySelectorAll("[data-react]").forEach(b=>b.onclick=()=>reactivate(b.dataset.react,b.dataset.line,b.dataset.title));
 }
@@ -295,9 +304,13 @@ async function saveInlineRow(line){
     p_cost_per_unit:owner?num(val("cost",r.cost_per_unit),r.cost_per_unit):null
   };
   if(!Number.isFinite(args.p_pallet_number)){alert("Enter a valid pallet number.");return}
+  args.p_expected_version=r.row_version;
   btn.disabled=true;btn.textContent="Saving…";
-  const {error}=await sb.rpc("save_inventory_row_v2",args);
-  if(error){btn.disabled=false;btn.textContent="Save";alert(error.message);return}
+  const {error}=await sb.rpc("save_inventory_row_v3",args);
+  if(error){
+    if(String(error.message).includes(STALE)){alert(error.message+"\n\nThe latest data will now be loaded. Please enter your change again.");await load($("#search").value);return}
+    btn.disabled=false;btn.textContent="Save";alert(error.message);return
+  }
   await load($("#search").value);
 }
 document.querySelectorAll("th[data-sort]").forEach(th=>th.addEventListener("click",()=>{
@@ -327,12 +340,37 @@ $("#activeView").onclick=async()=>{viewMode="active";updateViewButtons();await l
 $("#archivedView").onclick=async()=>{viewMode="archived";updateViewButtons();await load($("#search").value)};
 updateViewButtons();
 $("#search").oninput=e=>{clearTimeout(window._t);window._t=setTimeout(()=>load(e.target.value),250)};$("#refresh").onclick=()=>load($("#search").value);
-$("#addBtn").onclick=()=>{$("#addModal").classList.add("open");selectedProduct=null;$("#matches").innerHTML="";$("#matchMsg").textContent=""}
+// Add Pallet modal: a new pallet (target null) or another product on an existing active pallet (target = its row).
+function openAdd(target){
+  addTarget=target||null;selectedProduct=null;$("#matches").innerHTML="";$("#matchMsg").textContent="";$("#locWarn").textContent="";
+  $("#addTitle").textContent=addTarget?`Add product to pallet ${addTarget.pallet_number}`:"Add Pallet";
+  $("#addTargetInfo").textContent=addTarget?`Pallet ${addTarget.pallet_number} at ${addTarget.location||"(no location)"}. The new product line uses this pallet's number and location.`:"";
+  $("#a_location_box").classList.toggle("hide",!!addTarget);
+  $("#addModal").classList.add("open");
+}
+$("#addBtn").onclick=()=>openAdd(null);
 $("#findProduct").onclick=async()=>{const {data,error}=await sb.rpc("find_product_candidates",{p_upc:$("#a_upc").value||null,p_fnsku:$("#a_fnsku").value||null,p_item_number:$("#a_item").value||null,p_asin:$("#a_asin")?.value||null,p_title:$("#a_title").value||null});if(error){$("#matchMsg").textContent=error.message;return}$("#matches").innerHTML=(data||[]).map(r=>`<div class="card"><b>${esc(r.title)}</b> <span class="muted">${esc(r.match_reason)}</span><div class="muted">${esc(r.identifiers)} ${esc(r.asins)}</div><button data-pick="${r.product_id}" data-title="${esc(r.title)}">Use Existing Product</button></div>`).join("")||'<span class="muted">No match. A new product will be created.</span>';document.querySelectorAll("[data-pick]").forEach(b=>b.onclick=()=>{selectedProduct=Number(b.dataset.pick);$("#a_title").value=b.dataset.title;$("#matches").innerHTML='<span class="good">Existing product selected.</span>'})}
-$("#a_location").onblur=async()=>{const {data}=await sb.rpc("check_location",{p_location:$("#a_location").value});$("#locWarn").textContent=data?.length?"⚠ Location already in use: "+data.map(x=>"Pallet "+x.pallet_number+" "+x.title).join("; "):""}
-$("#savePallet").onclick=async()=>{const p={p_product_id:selectedProduct,p_upc:$("#a_upc").value||null,p_fnsku:$("#a_fnsku").value||null,p_other_identifier:null,p_item_number:$("#a_item").value||null,p_title:$("#a_title").value||null,p_asins:role==="owner"&&$("#a_asin").value?[$("#a_asin").value.trim()]:null,p_location:$("#a_location").value,p_cases:Number($("#a_cases").value),p_casepack:Number($("#a_casepack").value),p_case_box_dimensions:$("#a_case_dims").value||null,p_case_box_weight_lb:Number($("#a_case_weight").value)||null,p_item_dimensions:$("#a_itemdims").value||null,p_item_weight_lb:Number($("#a_item_weight").value)||null,p_country_of_origin:$("#a_country").value||null,p_label_status:$("#a_label").value};const {error}=await sb.rpc("create_pallet_v2",p);if(error){alert(error.message);return}close("addModal");await load($("#search").value)}
-async function duplicateLine(id,title){const loc=prompt("New location for "+title);if(!loc)return;const cases=Number(prompt("Cases"));const cp=Number(prompt("Casepack"));const {error}=await sb.rpc("duplicate_pallet_line",{p_source_line_id:Number(id),p_location:loc,p_cases:cases,p_casepack:cp});if(error)alert(error.message);else load($("#search").value)}
-async function reactivate(pid,lid,title){const loc=prompt("Current location for "+title);if(!loc)return;const cases=Number(prompt("Cases found"));const cp=Number(prompt("Casepack"));const {error}=await sb.rpc("reactivate_pallet_line",{p_pallet_id:Number(pid),p_line_id:Number(lid),p_new_location:loc,p_cases:cases,p_casepack:cp});if(error)alert(error.message);else load($("#search").value)}
+$("#a_location").onblur=async()=>{if(addTarget)return;const {data}=await sb.rpc("check_location",{p_location:$("#a_location").value});$("#locWarn").textContent=data?.length?"⚠ Location already in use: "+data.map(x=>"Pallet "+x.pallet_number+" "+x.title).join("; "):""}
+$("#savePallet").onclick=async()=>{
+  if(savingPallet)return;
+  const cases=wholeOrNull($("#a_cases").value),casepack=wholeOrNull($("#a_casepack").value);
+  if(cases==null){alert("Cases must be a whole number (0 or more).");return}
+  if(casepack==null||casepack<1){alert("Casepack must be a whole number of 1 or more.");return}
+  if(!addTarget&&!$("#a_location").value.trim()){alert("Location is required.");return}
+  const p={p_product_id:selectedProduct,p_upc:$("#a_upc").value||null,p_fnsku:$("#a_fnsku").value||null,p_other_identifier:null,p_item_number:$("#a_item").value||null,p_title:$("#a_title").value||null,p_asins:role==="owner"&&$("#a_asin").value?[$("#a_asin").value.trim()]:null,p_cases:cases,p_casepack:casepack,p_case_box_dimensions:$("#a_case_dims").value||null,p_case_box_weight_lb:Number($("#a_case_weight").value)||null,p_item_dimensions:$("#a_itemdims").value||null,p_item_weight_lb:Number($("#a_item_weight").value)||null,p_country_of_origin:$("#a_country").value||null,p_label_status:$("#a_label").value};
+  const btn=$("#savePallet");savingPallet=true;btn.disabled=true;btn.textContent="Saving…";
+  try{
+    const {error}=addTarget
+      ?await sb.rpc("add_pallet_line_v1",{...p,p_pallet_id:addTarget.pallet_id,p_expected_version:addTarget.row_version})
+      :await sb.rpc("create_pallet_v2",{...p,p_location:$("#a_location").value});
+    if(error){alert(error.message+(String(error.message).includes(STALE)?"\n\nClose this window and refresh, then try again.":""));return}
+    close("addModal");addTarget=null;await load($("#search").value);
+  }finally{savingPallet=false;btn.disabled=false;btn.textContent="Save Pallet"}
+}
+// Prompts: Cancel or an invalid number stops before anything is sent.
+function askWhole(label,min){const s=prompt(label);if(s==null)return null;const n=wholeOrNull(s);if(n==null||n<min){alert(label+" must be a whole number"+(min>0?" of "+min+" or more.":" (0 or more)."));return null}return n}
+async function duplicateLine(id,title){const loc=prompt("New location for "+title);if(!loc||!loc.trim())return;const cases=askWhole("Cases",0);if(cases==null)return;const cp=askWhole("Casepack",1);if(cp==null)return;const {error}=await sb.rpc("duplicate_pallet_line",{p_source_line_id:Number(id),p_location:loc,p_cases:cases,p_casepack:cp});if(error)alert(error.message);else load($("#search").value)}
+async function reactivate(pid,lid,title){const r=current.find(x=>Number(x.line_id)===Number(lid));if(!r)return;const loc=prompt("Current location for "+title);if(!loc||!loc.trim())return;const cases=askWhole("Cases found",0);if(cases==null)return;const cp=askWhole("Casepack",1);if(cp==null)return;const {error}=await sb.rpc("reactivate_pallet_line_v2",{p_pallet_id:Number(pid),p_line_id:Number(lid),p_expected_version:r.row_version,p_new_location:loc,p_cases:cases,p_casepack:cp});if(error){alert(error.message);if(String(error.message).includes(STALE))load($("#search").value)}else load($("#search").value)}
 async function history(pid){const {data,error}=await sb.rpc("get_pallet_history_v2",{p_pallet_id:Number(pid)});$("#smTitle").textContent="Pallet History";$("#smBody").innerHTML=error?esc(error.message):(data||[]).map(x=>`<div class="card"><b>${new Date(x.created_at).toLocaleString()}</b><div class="muted">${esc(x.actor_role||"")}</div><p>${esc(x.summary||"Updated.")}</p></div>`).join("")||'<p class="muted">No history yet.</p>';$("#simpleModal").classList.add("open")}
 enter();
 </script>
