@@ -102,7 +102,7 @@ const numInput=(field,value)=>`<input class="cellInput num" data-field="${field}
 const textInput=(field,value)=>`<input class="cellInput" data-field="${field}" type="text" value="${esc(raw(value))}">`;
 const weightInput=(field,value)=>`<div class="weightBox">${numInput(field,value)}<span class="weightSuffix">lbs</span></div>`;
 function measurementText(r){
-  const wh=[r.warehouse_item_dimensions,r.warehouse_item_weight_lb!=null&&r.warehouse_item_weight_lb!==""?`<span class="nowrap">${esc(r.warehouse_item_weight_lb)} lbs</span>`:""].filter(Boolean).join(" · ");
+  const wh=[esc(r.warehouse_item_dimensions),r.warehouse_item_weight_lb!=null&&r.warehouse_item_weight_lb!==""?`<span class="nowrap">${esc(r.warehouse_item_weight_lb)} lbs</span>`:""].filter(Boolean).join(" · ");
   const am=[r.amazon_item_dimensions,r.amazon_item_weight_lb!=null&&r.amazon_item_weight_lb!==""?`${r.amazon_item_weight_lb} lbs`:""].filter(Boolean).join(" · ");
   return `${wh||"—"}${am?`<div class="displaySub">Amazon: ${esc(am)}</div>`:""}${r.dimension_alert?`<div class="warn">⚠ ${esc(r.dimension_alert)}</div>`:""}`;
 }
