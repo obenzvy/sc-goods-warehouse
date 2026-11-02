@@ -14,7 +14,11 @@
     .muted{color:var(--muted);font-size:12px}.warn{color:var(--warn);font-weight:700}.good{color:var(--ok);font-weight:700}.row{display:flex;gap:8px;align-items:center}.pill{background:#eef2f7;color:#243a53;padding:3px 7px;border-radius:999px;font-size:11px}
     .toolbar{display:flex;gap:8px;align-items:center;margin-bottom:10px}.toolbar input{flex:1}.viewToggle{display:flex;gap:3px}.viewToggle button{padding:8px 10px}.tablewrap{overflow:auto;border:1px solid var(--line);border-radius:10px;background:#fff}
     table{border-collapse:collapse;width:100%;table-layout:fixed}th,td{padding:5px 5px;border-bottom:1px solid #edf0f4;text-align:left;vertical-align:middle;overflow:hidden;text-overflow:ellipsis}tbody tr{transition:background-color .1s ease}tbody tr:hover{background:#eef6ff}tbody tr.selectedRow{background:#dfeeff}tbody tr.dirtyRow{background:#fff7d6}tbody tr.dirtyRow:hover{background:#fff1bd}th{background:#eef3f8;font-size:10px;text-transform:uppercase;position:sticky;top:0;white-space:nowrap;overflow:visible;text-overflow:clip}.sortable{cursor:pointer;user-select:none}.sortable:hover{background:#e1eaf4}.sortArrow{font-size:9px;margin-left:2px}.right{text-align:right}.asinStack{line-height:1.25;white-space:normal;overflow-wrap:anywhere}.actions{display:flex;gap:3px;flex-wrap:wrap;align-items:center}.actions button{padding:4px 5px;font-size:11px;white-space:nowrap}.displayCell{display:block;min-height:23px;padding:3px 3px;border-radius:4px;white-space:normal;overflow-wrap:anywhere}.displayCell.editable{cursor:default}.nowrap{white-space:nowrap}.editingCell{overflow:visible}.displaySub{font-size:10px;color:#65758b;line-height:1.2;margin-top:2px}.cellInput,.cellSelect,.cellArea{width:100%;min-width:0;padding:4px 5px;border:1px solid #1769aa;border-radius:4px;background:#fff;color:inherit}.cellInput:focus,.cellSelect:focus,.cellArea:focus{outline:none;box-shadow:0 0 0 2px #1769aa18}.cellInput.num{text-align:right}.cellArea{resize:vertical;min-height:34px;line-height:1.2}.editPair{display:grid;grid-template-columns:minmax(0,1fr) 52px;gap:3px;align-items:center}.weightBox{display:flex;align-items:center;gap:2px}.weightBox .cellInput{min-width:0}.weightSuffix{font-size:10px;color:#65758b;white-space:nowrap}.costEdit{display:flex;align-items:center;gap:2px}.costPrefix{font-weight:700}.dirtyRow{background:#fff7d6}.saveBtn{min-width:46px;visibility:hidden}.dirtyRow .saveBtn{visibility:visible}
-th:nth-child(1),td:nth-child(1){width:4.5%}th:nth-child(2),td:nth-child(2){width:6%}th:nth-child(3),td:nth-child(3){width:21%}th:nth-child(4),td:nth-child(4){width:8%}th:nth-child(5),td:nth-child(5){width:4.5%}th:nth-child(6),td:nth-child(6){width:5.5%}th:nth-child(7),td:nth-child(7){width:6%}th:nth-child(8),td:nth-child(8){width:8%}th:nth-child(9),td:nth-child(9){width:8%}th:nth-child(10),td:nth-child(10){width:5%}th:nth-child(11),td:nth-child(11){width:6%}th:nth-child(12),td:nth-child(12){width:17.5%}
+th:nth-child(1),td:nth-child(1){width:4.5%}th:nth-child(2),td:nth-child(2){width:6%}th:nth-child(3),td:nth-child(3){width:21%}th:nth-child(4),td:nth-child(4){width:8%}th:nth-child(5),td:nth-child(5){width:4.5%}th:nth-child(6),td:nth-child(6){width:5.5%}th:nth-child(7),td:nth-child(7){width:6%}th:nth-child(8),td:nth-child(8){width:8%}th:nth-child(9),td:nth-child(9){width:8%}.colActions{width:17.5%}
+/* Owner view: four more columns (label/origin, unit cost, line value, pallet total) */
+body.owner th:nth-child(1),body.owner td:nth-child(1){width:4%}body.owner th:nth-child(2),body.owner td:nth-child(2){width:5.5%}body.owner th:nth-child(3),body.owner td:nth-child(3){width:15%}body.owner th:nth-child(4),body.owner td:nth-child(4){width:7%}body.owner th:nth-child(5),body.owner td:nth-child(5){width:4.5%}body.owner th:nth-child(6),body.owner td:nth-child(6){width:4.5%}body.owner th:nth-child(7),body.owner td:nth-child(7){width:5%}body.owner th:nth-child(8),body.owner td:nth-child(8){width:7.5%}body.owner th:nth-child(9),body.owner td:nth-child(9){width:7%}body.owner .colLabel{width:6.5%}body.owner .colCost{width:5%}body.owner .colValue{width:5.5%}body.owner .colTotal{width:6.5%}body.owner .colActions{width:16.5%}
+    body.owner #tbody td[data-edit-field] .displayCell.editable{cursor:pointer}body.owner #tbody td[data-edit-field] .displayCell.editable:hover{outline:1px dashed #1769aa}
+    .ownerEditor{display:grid;gap:3px}.ownerEditor label{font-size:9px;margin:0;color:#53657a}.ownerEditor .edNote{font-size:9px;color:#65758b;line-height:1.2}.ownerEditor .edBtns{display:flex;gap:3px}.ownerEditor .edBtns button{padding:2px 6px;font-size:11px}td.dirtyCell{background:#ffe9a8}.missing{color:var(--warn);font-weight:700}
     .hide{display:none!important}.ownerOnly{display:none}body.owner .ownerOnly{display:block}body.owner td.ownerOnly,body.owner th.ownerOnly{display:table-cell}
     .modal{position:fixed;inset:0;background:#0006;display:none;align-items:center;justify-content:center;padding:20px;z-index:20}.modal.open{display:flex}.modalbox{background:#fff;max-width:950px;width:100%;max-height:92vh;overflow:auto;border-radius:12px;padding:18px}
     .section{font-weight:700;margin:15px 0 8px;padding-bottom:5px;border-bottom:1px solid #e5e7eb}.measurement-note{background:#eef6ff;border-left:4px solid var(--blue);padding:10px;margin-top:10px}.danger{color:#a11}
@@ -45,9 +49,11 @@ th:nth-child(1),td:nth-child(1){width:4.5%}th:nth-child(2),td:nth-child(2){width
       <th class="sortable" data-sort="available_units">Available <span class="sortArrow"></span></th>
       <th class="sortable" data-sort="warehouse_item_dimensions">Item measurement <span class="sortArrow"></span></th>
       <th class="sortable" data-sort="casepack_box_dimensions">Casepack carton <span class="sortArrow"></span></th>
-      <th class="ownerOnly sortable" data-sort="cost_per_unit">Cost <span class="sortArrow"></span></th>
-      <th class="ownerOnly sortable" data-sort="inventory_value">Value <span class="sortArrow"></span></th>
-      <th>Actions</th>
+      <th class="ownerOnly sortable colLabel" data-sort="label_status">Label / Origin <span class="sortArrow"></span></th>
+      <th class="ownerOnly sortable colCost" data-sort="cost_per_unit">Unit cost <span class="sortArrow"></span></th>
+      <th class="ownerOnly sortable colValue" data-sort="line_value">Line value <span class="sortArrow"></span></th>
+      <th class="ownerOnly sortable colTotal" data-sort="pallet_value">Pallet total <span class="sortArrow"></span></th>
+      <th class="colActions">Actions</th>
     </tr></thead><tbody id="tbody"></tbody></table></div>
   </div>
 </div>
@@ -97,6 +103,14 @@ const looseUnits=r=>{if(r.cases==null||r.casepack==null||r.physical_units==null)
 const wholeOrNull=s=>{const t=String(s??"").trim();if(t==="")return null;const n=Number(t);return Number.isSafeInteger(n)&&n>=0?n:null};
 const STALE="changed by someone else";
 let addTarget=null,savingPallet=false;
+// Owner view: a missing cost is shown as missing (never as $0); a pallet total with missing costs is marked incomplete.
+const missingText='<span class="missing">Missing</span>';
+function palletTotal(r){
+  const n=Number(r.pallet_line_count||0),miss=Number(r.pallet_missing_cost_lines||0);
+  if(r.pallet_value==null)return missingText;
+  const lines=n>1?`<div class="displaySub">${n} product lines</div>`:"";
+  return `${money(r.pallet_value)}${miss?`<div class="displaySub missing">Incomplete: ${miss} of ${n} line${n===1?"":"s"} without cost</div>`:lines}`;
+}
 const display=(html,field,editable=true)=>`<div class="displayCell${editable?" editable":""}" data-edit-field="${field}">${html}</div>`;
 const numInput=(field,value)=>`<input class="cellInput num" data-field="${field}" type="number" step="any" min="0" value="${esc(raw(value))}">`;
 const textInput=(field,value)=>`<input class="cellInput" data-field="${field}" type="text" value="${esc(raw(value))}">`;
@@ -187,7 +201,7 @@ function selectCellText(td){
   const range=document.createRange();range.selectNodeContents(target);sel.removeAllRanges();sel.addRange(range);
 }
 function sortValue(r,key){
-  if(["pallet_number","cases","casepack","available_units","cost_per_unit","inventory_value"].includes(key))return Number(r[key]??-Infinity);
+  if(["pallet_number","cases","casepack","available_units","cost_per_unit","inventory_value","line_value","pallet_value"].includes(key))return Number(r[key]??-Infinity);
   return String(r[key]??"").toLowerCase();
 }
 function sortedRows(){
@@ -210,32 +224,45 @@ $("#signin").onclick=async()=>{const {error}=await sb.auth.signInWithPassword({e
 $("#signup").onclick=async()=>{const email=$("#email").value.trim();const password=$("#password").value;const {error}=await sb.auth.signUp({email,password,options:{emailRedirectTo:PORTAL_URL}});$("#authMsg").textContent=error?error.message:"Account created. Check your email and click the confirmation link. It will return you to this warehouse portal."}
 $("#resend").onclick=async()=>{const email=$("#email").value.trim();if(!email){$("#authMsg").textContent="Enter your email first.";return}const {error}=await sb.auth.resend({type:"signup",email,options:{emailRedirectTo:PORTAL_URL}});$("#authMsg").textContent=error?error.message:"Confirmation email resent. Use the newest email; older confirmation links can expire."}
 $("#logout").onclick=async()=>{await sb.auth.signOut();location.reload()}
-async function load(q){
-  const fn=role==="owner"?"owner_portal_inventory_search_v3":"portal_inventory_search_v3";
-  const {data,error}=await sb.rpc(fn,{p_query:q||"",p_view:viewMode});
+let loadSeq=0;
+// The view (Active/Archived) changes only together with the rows that belong to it.
+async function load(q,view=viewMode){
+  if(!discardOwnerEditor())return;
+  const seq=++loadSeq;
+  const fn=role==="owner"?"owner_portal_inventory_search_v4":"portal_inventory_search_v3";
+  const {data,error}=await sb.rpc(fn,{p_query:q||"",p_view:view});
+  if(seq!==loadSeq)return;                    // a newer search/refresh replaced this one
+  if(!discardOwnerEditor())return;            // an Owner editor opened while this was loading: ask before redrawing
+  viewMode=view;updateViewButtons();
   if(error){$("#tbody").innerHTML=`<tr><td colspan="12">${esc(error.message)}</td></tr>`;return}
   current=data||[];
   renderRows();
 }
 function renderRows(){
   const owner=role==="owner";
+  ownerEd=null;
   $("#tbody").innerHTML=sortedRows().map(r=>{
-    const operational=owner||r.pallet_status==="active";
+    // Owner corrections go through owner_pallet_fields_v1, which accepts active lines of active pallets only.
+    const operational=owner?(r.pallet_status==="active"&&viewMode==="active"):r.pallet_status==="active";
     const productHtml=`<b>${esc(r.title)}</b><div class="displaySub">${esc(r.identifiers||"")}</div>`;
     return `<tr data-line="${r.line_id}">
-      <td data-edit-field="pallet">${display(`<b>${esc(r.pallet_number)}</b>`,"pallet",owner)}</td>
+      <td data-edit-field="pallet">${display(`<b>${esc(r.pallet_number)}</b>`,"pallet",owner&&operational)}</td>
       <td data-edit-field="location">${display(esc(r.location||"—"),"location",operational)}</td>
-      <td data-edit-field="product">${display(productHtml,"product",owner)}</td>
-      <td data-edit-field="asins">${display(`<div class="asinStack">${asinDisplay(r.asins)}</div>`,"asins",owner)}</td>
+      <td data-edit-field="product">${display(productHtml,"product",owner&&operational)}</td>
+      <td data-edit-field="asins">${display(`<div class="asinStack">${asinDisplay(r.asins)}</div>`,"asins",owner&&operational)}</td>
       <td data-edit-field="cases" class="right">${display(fmt(r.cases)+looseUnits(r),"cases",operational)}</td>
       <td data-edit-field="casepack" class="right">${display(fmt(r.casepack),"casepack",operational)}</td>
       <td data-edit-field="available" class="right">${display(`<b>${fmt(r.available_units)}</b>`,"available",operational)}</td>
       <td data-edit-field="itemmeasurement">${display(measurementText(r),"itemmeasurement",operational)}</td>
       <td data-edit-field="casecarton">${display(cartonText(r),"casecarton",operational)}</td>
-      <td data-edit-field="cost" class="ownerOnly right">${display(money(r.cost_per_unit),"cost",owner)}</td>
-      <td class="ownerOnly right">${money(r.inventory_value)}</td>
-      <td><div class="actions">
-        ${operational?`<button class="primary saveBtn" data-save="${r.line_id}">Save</button>`:""}
+      ${owner?`<td data-edit-field="labelorigin" class="ownerOnly colLabel">${display(`${esc(r.label_status||"—")}<div class="displaySub">${esc(r.country_of_origin||"—")}</div>`,"labelorigin",operational)}</td>
+      <td data-edit-field="cost" class="ownerOnly right colCost">${display(r.cost_per_unit==null?missingText:money(r.cost_per_unit),"cost",operational)}</td>
+      <td class="ownerOnly right colValue">${r.line_value==null?missingText:money(r.line_value)}</td>
+      <td class="ownerOnly right colTotal">${palletTotal(r)}</td>`:""}
+      <td class="colActions"><div class="actions">
+        ${operational&&!owner?`<button class="primary saveBtn" data-save="${r.line_id}">Save</button>`:""}
+        ${owner&&viewMode==="active"&&r.pallet_status==="active"?`<button data-archive="${r.line_id}">Archive pallet</button>`:""}
+        ${owner&&r.pallet_status==="archived"?`<button data-reactpallet="${r.line_id}">Reactivate pallet</button>`:""}
         <button data-dup="${r.line_id}" data-title="${esc(r.title)}">Duplicate</button>
         ${r.pallet_status==="active"&&viewMode==="active"?`<button data-addline="${r.line_id}" title="Add another product to pallet ${esc(r.pallet_number)}">Add product</button>`:""}
         <button data-hist="${r.pallet_id}">History</button>
@@ -247,14 +274,17 @@ function renderRows(){
   updateSortIndicators();
 }
 function bindRows(){
+  const owner=role==="owner";
   document.querySelectorAll("#tbody td[data-edit-field]").forEach(td=>{
     td.addEventListener("click",e=>{
       if(e.target.closest("input,select,textarea,button"))return;
       const tr=td.closest("tr");
       document.querySelectorAll("#tbody tr.selectedRow").forEach(x=>x.classList.remove("selectedRow"));
       tr?.classList.add("selectedRow");
+      if(owner){const r=current.find(x=>Number(x.line_id)===Number(tr?.dataset.line));if(r)ownerEdit(td,r,td.dataset.editField);return}
       selectCellText(td);
     });
+    if(owner)return;
     td.addEventListener("dblclick",e=>{
       if(e.target.closest("input,select,textarea"))return;
       const tr=td.closest("tr");
@@ -274,6 +304,153 @@ function bindRows(){
   document.querySelectorAll("[data-addline]").forEach(b=>b.onclick=()=>openAdd(current.find(x=>Number(x.line_id)===Number(b.dataset.addline))));
   document.querySelectorAll("[data-hist]").forEach(b=>b.onclick=()=>history(b.dataset.hist));
   document.querySelectorAll("[data-react]").forEach(b=>b.onclick=()=>reactivate(b.dataset.react,b.dataset.line,b.dataset.title));
+  const rowOf=id=>current.find(x=>Number(x.line_id)===Number(id));
+  document.querySelectorAll("[data-archive]").forEach(b=>b.onclick=()=>palletStatus(rowOf(b.dataset.archive),"archive"));
+  document.querySelectorAll("[data-reactpallet]").forEach(b=>b.onclick=()=>palletStatus(rowOf(b.dataset.reactpallet),"reactivate"));
+}
+// ---- Owner single-click corrections: one open editor at a time, explicit Save / Cancel, nothing saved on blur ----
+// Each cell lists its fields and their scope. Product fields belong to the shared product record (the server asks
+// for confirmation when other pallet lines use it); line fields change this pallet line only.
+const LABELS=["Original UPC / unlabeled","FNSKU labeled"];
+const OWNER_FIELDS={
+  pallet:[{k:"pallet_number",label:"Pallet number",type:"int",min:1,get:r=>r.pallet_number}],
+  location:[{k:"location",label:"Location",get:r=>r.location}],
+  product:[{k:"title",label:"Description",get:r=>r.title},{k:"upc",label:"UPC",get:r=>r.upc},{k:"fnsku",label:"FNSKU",get:r=>r.fnsku},{k:"item_number",label:"Item #",get:r=>r.item_number}],
+  asins:[{k:"asins",label:"ASINs (one per line)",type:"area",get:r=>asins(r.asins).join("\n")}],
+  cases:[{k:"cases",label:"Full cases",type:"int",min:0,get:r=>r.cases}],
+  casepack:[{k:"casepack",label:"Casepack",type:"int",min:1,get:r=>r.casepack}],
+  available:[{k:"available_units",label:"Available units",type:"int",min:0,get:r=>r.available_units}],
+  itemmeasurement:[{k:"item_dimensions",label:"Item L×W×H (this line)",get:r=>r.warehouse_item_dimensions},{k:"item_weight_lb",label:"Item weight lb (product)",type:"num",get:r=>r.warehouse_item_weight_lb}],
+  casecarton:[{k:"case_box_dimensions",label:"Carton L×W×H",get:r=>r.casepack_box_dimensions},{k:"case_box_weight_lb",label:"Carton weight lb",type:"num",get:r=>r.casepack_box_weight_lb}],
+  labelorigin:[{k:"label_status",label:"Label status",type:"select",get:r=>r.label_status},{k:"country_of_origin",label:"Country of origin",get:r=>r.country_of_origin}],
+  cost:[{k:"cost_per_unit",label:"Unit cost $",type:"num",get:r=>r.cost_per_unit}]
+};
+const PRODUCT_KEYS=["title","upc","fnsku","item_number","asins","item_weight_lb"];
+const NOTES={
+  cases:r=>`Descriptive only: units stay ${fmt(r.available_units)}. To change the quantity, edit Available.`,
+  casepack:r=>`Descriptive only: units stay ${fmt(r.available_units)}. To change the quantity, edit Available.`,
+  available:()=>"Changes the quantity on this line; cases are recounted as full cases.",
+  cost:()=>"This line only. Line value = available × cost. Leave blank to clear the cost to Missing; 0 means a real $0 cost.",
+  location:()=>"Applies to the whole pallet.",pallet:()=>"Applies to the whole pallet.",
+  labelorigin:()=>"This line only.",casecarton:()=>"This line only. Blank = product default."
+};
+let ownerEd=null;
+const edValue=v=>v==null?"":String(v);
+function ownerEdDirty(){
+  if(!ownerEd)return false;
+  return ownerEd.fields.some(f=>{const el=ownerEd.td.querySelector(`[data-ofield="${f.k}"]`);return el&&el.value.trim()!==edValue(f.get(ownerEd.r)).trim()});
+}
+function closeOwnerEditor(){
+  if(!ownerEd)return;
+  const {td}=ownerEd;ownerEd=null;
+  td.innerHTML=td._displayHtml||"";td.classList.remove("editingCell","dirtyCell");td.closest("tr")?.classList.remove("dirtyRow");
+}
+// Before anything redraws the table: an unsaved correction is only dropped when the Owner agrees; a correction that
+// is being saved is never dropped (the save reloads the table itself when it finishes).
+function discardOwnerEditor(){
+  if(ownerEd&&ownerEd.saving)return false;
+  if(!ownerEdDirty()){closeOwnerEditor();return true}
+  if(!confirm("Discard the unsaved change?"))return false;
+  closeOwnerEditor();return true;
+}
+function ownerEdit(td,r,field){
+  const fields=OWNER_FIELDS[field];
+  if(!fields||!td.querySelector(".displayCell.editable"))return;
+  if(ownerEd){
+    if(ownerEd.td===td||ownerEd.saving)return;
+    if(ownerEdDirty()){alert("Save or cancel the open change first.");ownerEd.td.querySelector("[data-ofield]")?.focus();return}
+    closeOwnerEditor();
+  }
+  const shared=fields.some(f=>PRODUCT_KEYS.includes(f.k))&&Number(r.product_line_count)>1;
+  const input=f=>{
+    const v=esc(edValue(f.get(r)));
+    if(f.type==="area")return `<textarea class="cellArea" data-ofield="${f.k}" rows="2">${v}</textarea>`;
+    if(f.type==="select"){const opts=LABELS.includes(edValue(f.get(r)))?LABELS:[edValue(f.get(r)),...LABELS];return `<select class="cellSelect" data-ofield="${f.k}">${opts.map(o=>`<option${o===edValue(f.get(r))?" selected":""}>${esc(o)}</option>`).join("")}</select>`}
+    const num=f.type==="int"||f.type==="num";
+    return `<input class="cellInput${num?" num":""}" data-ofield="${f.k}" type="${num?"number":"text"}"${num?` step="${f.type==="int"?1:"any"}" min="${f.min??0}"`:""} value="${v}">`;
+  };
+  td._displayHtml=td.innerHTML;
+  td.classList.add("editingCell");
+  td.innerHTML=`<div class="ownerEditor">${fields.map(f=>(fields.length>1?`<label>${esc(f.label)}</label>`:"")+input(f)).join("")}
+    ${NOTES[field]?`<div class="edNote">${esc(NOTES[field](r))}</div>`:""}${shared?`<div class="edNote missing">Shared product: also on ${Number(r.product_line_count)-1} other pallet line(s).</div>`:""}
+    <div class="edBtns"><button class="primary" data-osave disabled>Save</button><button data-ocancel>Cancel</button></div></div>`;
+  ownerEd={td,r,field,fields};
+  const refresh=()=>{const d=ownerEdDirty();td.classList.toggle("dirtyCell",d);td.closest("tr")?.classList.toggle("dirtyRow",d);td.querySelector("[data-osave]").disabled=!d};
+  td.querySelectorAll("[data-ofield]").forEach(el=>{
+    el.addEventListener("input",refresh);el.addEventListener("change",refresh);
+    el.addEventListener("keydown",e=>{
+      if(e.key==="Escape"){e.preventDefault();if(!ownerEd?.saving)closeOwnerEditor()}
+      else if(e.key==="Enter"&&el.tagName!=="TEXTAREA"){e.preventDefault();if(ownerEdDirty())saveOwnerEdit()}
+    });
+  });
+  td.querySelector("[data-osave]").onclick=e=>{e.stopPropagation();saveOwnerEdit()};
+  td.querySelector("[data-ocancel]").onclick=e=>{e.stopPropagation();if(!ownerEd?.saving)closeOwnerEditor()};
+  const first=td.querySelector("[data-ofield]");if(first){first.focus();if(first.select)first.select()}
+}
+async function saveOwnerEdit(){
+  if(!ownerEd||ownerEd.saving)return;
+  const {td,r,fields}=ownerEd,changes={};
+  for(const f of fields){
+    const v=td.querySelector(`[data-ofield="${f.k}"]`).value.trim();
+    if(v===edValue(f.get(r)).trim())continue;
+    if(f.type==="int"){const n=wholeOrNull(v);if(n==null||n<(f.min??0)){alert(`${f.label} must be a whole number${f.min?` of ${f.min} or more`:" (0 or more)"}.`);return}changes[f.k]=n;continue}
+    if(f.type==="num"){if(v===""){changes[f.k]=null;continue}const n=Number(v);if(!Number.isFinite(n)||n<0){alert(`${f.label} must be a number (0 or more).`);return}changes[f.k]=n;continue}
+    changes[f.k]=v;
+  }
+  if(!Object.keys(changes).length){closeOwnerEditor();return}
+  const cost=r.cost_per_unit==null?null:Number(r.cost_per_unit);
+  if("available_units" in changes){
+    const a=changes.available_units,cp=Number(r.casepack);
+    let msg=`Change the available units of pallet ${r.pallet_number} (${r.title}) from ${fmt(r.available_units)} to ${fmt(a)}?`;
+    if(cp>0)msg+=`\nCases will show ${fmt(Math.floor((a+Number(r.physical_units)-Number(r.available_units))/cp))} full cases.`;
+    msg+=cost==null?"\nThis line has no cost; its value stays missing.":`\nLine value: ${money(Number(r.available_units)*cost)} → ${money(a*cost)}.`;
+    if(!confirm(msg))return;
+  }
+  if("cost_per_unit" in changes){
+    const nc=changes.cost_per_unit;
+    const msg=nc==null
+      ?`Clear the unit cost of this line (${money(cost)}) back to Missing?\nLine value: ${money(Number(r.available_units)*cost)} → (missing). The pallet total will be marked incomplete.\nTo record a real $0 cost, enter 0 instead.`
+      :`Change the unit cost of this line from ${cost==null?"(missing)":money(cost)} to ${money(nc)}?\nLine value: ${cost==null?"(missing)":money(Number(r.available_units)*cost)} → ${money(Number(r.available_units)*nc)}.`;
+    if(!confirm(msg))return;
+  }
+  // While saving, this editor is locked (inputs, Save, Cancel) and no other editor can open, so the response always
+  // belongs to the editor on screen.
+  const ed=ownerEd;ed.saving=true;
+  const controls=[...td.querySelectorAll("[data-ofield],[data-osave],[data-ocancel]")];
+  const btn=td.querySelector("[data-osave]");
+  controls.forEach(c=>c.disabled=true);btn.textContent="Saving…";
+  const send=confirmShared=>sb.rpc("owner_pallet_fields_v1",{p_pallet_id:r.pallet_id,p_line_id:r.line_id,p_expected_version:r.row_version,p_changes:changes,p_confirm_shared:confirmShared});
+  let {error}=await send(false);
+  const shared=error&&String(error.message).match(/^SHARED_PRODUCT:(\d+):/);
+  if(shared){
+    if(confirm(`This product record is also used by ${shared[1]} other pallet line(s). The change will show on all of them.\n\nApply it to the shared product?`))({error}=await send(true));
+    else error={message:""};
+  }
+  ed.saving=false;
+  if(ownerEd!==ed)return;
+  if(error){
+    if(String(error.message).includes(STALE)){alert(error.message+"\n\nThe latest data will now be loaded. Please enter your change again.");closeOwnerEditor();await load($("#search").value);return}
+    if(error.message)alert(error.message);
+    controls.forEach(c=>c.disabled=false);btn.textContent="Save";return;
+  }
+  closeOwnerEditor();
+  await load($("#search").value);
+}
+// ---- Owner archive / reactivate of the whole pallet (all product lines), via owner_pallet_commit_v2 ----
+let palletBusy=false;
+async function palletStatus(r,action){
+  if(!r||palletBusy||!discardOwnerEditor())return;
+  const n=Number(r.pallet_line_count||1);
+  const msg=action==="archive"
+    ?`Archive pallet ${r.pallet_number} at ${r.location||"(no location)"}?\n\nAll ${n} product line${n===1?"":"s"} on this pallet move to Archived. Quantities, costs, history and deduction records are kept. You can reactivate it later.`
+    :`Reactivate pallet ${r.pallet_number} at ${r.location||"(no location)"}?\n\nLines that still have units become active again with their quantities and costs; empty lines stay archived.`;
+  if(!confirm(msg))return;
+  palletBusy=true;
+  try{
+    const {error}=await sb.rpc("owner_pallet_commit_v2",{p_action:action,p_pallet_id:r.pallet_id,p_line_id:null,p_expected_version:r.row_version,p_expected_cases:null,p_expected_casepack:null,p_expected_available:null,p_location:null,p_cases:null,p_casepack:null,p_unit_cost:null,p_note:null});
+    if(error)alert(error.message+(String(error.message).includes(STALE)?"\n\nThe latest data will now be loaded.":""));
+  }finally{palletBusy=false}
+  await load($("#search").value);
 }
 async function saveInlineRow(line){
   const tr=document.querySelector(`tr[data-line="${line}"]`);
@@ -315,17 +492,18 @@ async function saveInlineRow(line){
 }
 document.querySelectorAll("th[data-sort]").forEach(th=>th.addEventListener("click",()=>{
   const key=th.dataset.sort;
+  if(!discardOwnerEditor())return;
   if(sortKey===key)sortDir*=-1;else{sortKey=key;sortDir=1}
   renderRows();
 }));
 $("#exportBtn").onclick=()=>{
   const rows=sortedRows();
   const headers=["Pallet","Location","Product","Identifiers","ASIN","Cases","Casepack","Available","Item Dimensions","Item Weight (lbs)","Casepack Carton Dimensions","Casepack Carton Weight (lbs)"];
-  if(role==="owner")headers.push("Cost","Value");
+  if(role==="owner")headers.push("Label Status","Country of Origin","Unit Cost","Line Value","Pallet Total","Pallet Lines Without Cost");
   const csv=[headers];
   rows.forEach(r=>{
     const row=[r.pallet_number,r.location||"",r.title,r.identifiers||"",asins(r.asins).join(" | "),r.cases??"",r.casepack??"",r.available_units??"",r.warehouse_item_dimensions||"",r.warehouse_item_weight_lb??"",r.casepack_box_dimensions||"",r.casepack_box_weight_lb??""];
-    if(role==="owner")row.push(r.cost_per_unit??"",r.inventory_value??"");
+    if(role==="owner")row.push(r.label_status||"",r.country_of_origin||"",r.cost_per_unit??"MISSING",r.line_value??"MISSING",r.pallet_value??"MISSING",r.pallet_missing_cost_lines??"");
     csv.push(row);
   });
   const out=csv.map(row=>row.map(v=>`"${String(v??"").replaceAll('"','""')}"`).join(",")).join("\r\n");
@@ -336,8 +514,8 @@ function updateViewButtons(){
   $("#activeView").classList.toggle("primary",viewMode==="active");
   $("#archivedView").classList.toggle("primary",viewMode==="archived");
 }
-$("#activeView").onclick=async()=>{viewMode="active";updateViewButtons();await load($("#search").value)};
-$("#archivedView").onclick=async()=>{viewMode="archived";updateViewButtons();await load($("#search").value)};
+$("#activeView").onclick=()=>load($("#search").value,"active");
+$("#archivedView").onclick=()=>load($("#search").value,"archived");
 updateViewButtons();
 $("#search").oninput=e=>{clearTimeout(window._t);window._t=setTimeout(()=>load(e.target.value),250)};$("#refresh").onclick=()=>load($("#search").value);
 // Add Pallet modal: a new pallet (target null) or another product on an existing active pallet (target = its row).
