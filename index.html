@@ -37,8 +37,10 @@ body.owner th:nth-child(1),body.owner td:nth-child(1){width:4%}body.owner th:nth
 
   <div id="app" class="hide">
     <div id="unassigned" class="card hide"><b>This account is signed in but has not been assigned an Owner or Warehouse role yet.</b><p class="muted">Role assignment only needs to be done once.</p></div>
+    <div id="roleCheck" class="card hide"><b>Your access could not be confirmed right now.</b> <span class="muted">You are still signed in. This retries by itself.</span> <button id="roleRetry">Try now</button></div>
 
     <div class="toolbar"><button id="addBtn" class="primary">+ Add Pallet</button><div class="viewToggle"><button id="activeView" class="primary">Active</button><button id="archivedView">Archived</button></div><input id="search" placeholder="Search UPC, FNSKU, item #, ASIN, pallet, location or title"><button id="exportBtn">Export CSV</button><button id="refresh">Refresh</button></div>
+    <p id="loadMsg" class="warn"></p>
     <div class="tablewrap"><table><thead><tr>
       <th class="sortable" data-sort="pallet_number">Pallet <span class="sortArrow"></span></th>
       <th class="sortable" data-sort="location">Location <span class="sortArrow"></span></th>
@@ -63,11 +65,12 @@ body.owner th:nth-child(1),body.owner td:nth-child(1){width:4%}body.owner th:nth
   <p id="addTargetInfo" class="muted"></p>
   <div class="section">Identify product</div>
   <div class="grid"><div><label>UPC</label><input id="a_upc"></div><div><label>FNSKU</label><input id="a_fnsku"></div><div><label>Item #</label><input id="a_item"></div><div class="ownerOnly"><label>ASIN</label><input id="a_asin"></div></div>
+  <div id="fnskuPanel" class="muted" aria-live="polite"></div>
   <div style="margin-top:8px"><label>Description</label><input id="a_title"></div>
   <div class="row" style="margin:10px 0"><button id="findProduct">Find Existing Product</button><span id="matchMsg" class="muted"></span></div><div id="matches"></div>
 
   <div class="section">Pallet</div>
-  <div class="grid"><div id="a_location_box"><label>Location *</label><input id="a_location"></div><div><label>Cases *</label><input id="a_cases" type="number" min="0"></div><div><label>Casepack *</label><input id="a_casepack" type="number" min="1"></div><div><label>Label status</label><select id="a_label"><option>Original UPC / unlabeled</option><option>FNSKU labeled</option></select></div></div>
+  <div class="grid"><div id="a_location_box"><label>Location *</label><input id="a_location"></div><div id="a_number_box" class="ownerOnly"><label>Pallet number</label><input id="a_number" type="number" min="1" step="1" placeholder="Automatic"></div><div><label>Cases *</label><input id="a_cases" type="number" min="0"></div><div><label>Casepack *</label><input id="a_casepack" type="number" min="1"></div><div><label>Label status</label><select id="a_label"><option>Original UPC / unlabeled</option><option>FNSKU labeled</option></select></div></div>
   <p id="locWarn" class="warn"></p>
 
   <div class="section">Casepack carton — warehouse operations only</div>
@@ -102,7 +105,7 @@ const looseUnits=r=>{if(r.cases==null||r.casepack==null||r.physical_units==null)
 // Whole-number field value, or null when blank or invalid.
 const wholeOrNull=s=>{const t=String(s??"").trim();if(t==="")return null;const n=Number(t);return Number.isSafeInteger(n)&&n>=0?n:null};
 const STALE="changed by someone else";
-let addTarget=null,savingPallet=false;
+let addTarget=null,savingPallet=false,fnskuTicket=0;
 // Owner view: a missing cost is shown as missing (never as $0); a pallet total with missing costs is marked incomplete.
 const missingText='<span class="missing">Missing</span>';
 function palletTotal(r){
@@ -218,8 +221,21 @@ function updateSortIndicators(){
   });
 }
 const close=id=>$("#"+id).classList.remove("open");document.querySelectorAll("[data-close]").forEach(b=>b.onclick=()=>close(b.dataset.close));
-async function getRole(){const {data}=await sb.rpc("get_my_role");return data}
-async function enter(){const {data:{session}}=await sb.auth.getSession();if(!session)return;$("#authCard").classList.add("hide");$("#app").classList.remove("hide");$("#logout").classList.remove("hide");role=await getRole();if(!role){$("#unassigned").classList.remove("hide");$("#addBtn").disabled=true;$("#search").disabled=true;return}document.body.classList.toggle("owner",role==="owner");$("#roleBadge").textContent=role.toUpperCase();await load("")}
+async function getRole(){const {data,error}=await sb.rpc("get_my_role");if(error)throw error;return data}
+// A failed role check is a temporary problem, not "no role": the session is kept, but nothing Owner-only stays on screen until the
+// database confirms the role again. The page says so and retries by itself. The role is read again when the page is returned to
+// and at every token renewal; a changed role or a different account reloads the page.
+let roleUnknown=false,roleTimer=null,userId=null,authGen=0;
+function lockView(){role=null;roleUnknown=true;authGen++;loadSeq++;current=[];document.body.classList.remove("owner");$("#tbody").replaceChildren();$("#roleBadge").textContent="";close("addModal");close("simpleModal");$("#roleCheck").classList.remove("hide");clearTimeout(roleTimer);roleTimer=setTimeout(enter,10000)}
+async function enter(){const {data:{session}}=await sb.auth.getSession();if(!session)return;userId=session.user&&session.user.id;$("#authCard").classList.add("hide");$("#app").classList.remove("hide");$("#logout").classList.remove("hide");
+  try{role=await getRole();roleUnknown=false}catch(e){lockView();return}
+  clearTimeout(roleTimer);$("#roleCheck").classList.add("hide");
+  if(!role){$("#unassigned").classList.remove("hide");$("#addBtn").disabled=true;$("#search").disabled=true;return}
+  $("#unassigned").classList.add("hide");$("#addBtn").disabled=false;$("#search").disabled=false;document.body.classList.toggle("owner",role==="owner");$("#roleBadge").textContent=role.toUpperCase();await load("")}
+async function returned(){if(document.visibilityState!=="visible")return;if(roleUnknown){enter();return}if(!role)return;try{const now=await getRole();if(now!==role)location.reload()}catch(e){lockView()}}
+document.addEventListener("visibilitychange",returned);window.addEventListener("online",returned);
+sb.auth.onAuthStateChange((ev,s)=>{setTimeout(()=>{if(ev==="SIGNED_OUT"||(userId&&s&&s.user&&s.user.id!==userId)){location.reload();return}if(ev==="TOKEN_REFRESHED")returned()},0)});
+$("#roleRetry").onclick=()=>enter();
 $("#signin").onclick=async()=>{const {error}=await sb.auth.signInWithPassword({email:$("#email").value.trim(),password:$("#password").value});$("#authMsg").textContent=error?error.message:"";if(!error)enter()}
 $("#signup").onclick=async()=>{const email=$("#email").value.trim();const password=$("#password").value;const {error}=await sb.auth.signUp({email,password,options:{emailRedirectTo:PORTAL_URL}});$("#authMsg").textContent=error?error.message:"Account created. Check your email and click the confirmation link. It will return you to this warehouse portal."}
 $("#resend").onclick=async()=>{const email=$("#email").value.trim();if(!email){$("#authMsg").textContent="Enter your email first.";return}const {error}=await sb.auth.resend({type:"signup",email,options:{emailRedirectTo:PORTAL_URL}});$("#authMsg").textContent=error?error.message:"Confirmation email resent. Use the newest email; older confirmation links can expire."}
@@ -233,8 +249,11 @@ async function load(q,view=viewMode){
   const {data,error}=await sb.rpc(fn,{p_query:q||"",p_view:view});
   if(seq!==loadSeq)return;                    // a newer search/refresh replaced this one
   if(!discardOwnerEditor())return;            // an Owner editor opened while this was loading: ask before redrawing
+  // A failed refresh leaves the rows of this view on screen and says so.
+  if(error&&current.length&&view===viewMode){$("#loadMsg").textContent="Could not refresh: "+error.message;return}
   viewMode=view;updateViewButtons();
   if(error){$("#tbody").innerHTML=`<tr><td colspan="12">${esc(error.message)}</td></tr>`;return}
+  $("#loadMsg").textContent="";
   current=data||[];
   renderRows();
 }
@@ -523,11 +542,33 @@ function openAdd(target){
   addTarget=target||null;selectedProduct=null;$("#matches").innerHTML="";$("#matchMsg").textContent="";$("#locWarn").textContent="";
   $("#addTitle").textContent=addTarget?`Add product to pallet ${addTarget.pallet_number}`:"Add Pallet";
   $("#addTargetInfo").textContent=addTarget?`Pallet ${addTarget.pallet_number} at ${addTarget.location||"(no location)"}. The new product line uses this pallet's number and location.`:"";
-  $("#a_location_box").classList.toggle("hide",!!addTarget);
+  $("#a_location_box").classList.toggle("hide",!!addTarget);$("#a_number_box").classList.toggle("hide",!!addTarget);$("#a_number").value="";fnskuTicket++;$("#fnskuPanel").textContent="";
   $("#addModal").classList.add("open");
 }
 $("#addBtn").onclick=()=>openAdd(null);
-$("#findProduct").onclick=async()=>{const {data,error}=await sb.rpc("find_product_candidates",{p_upc:$("#a_upc").value||null,p_fnsku:$("#a_fnsku").value||null,p_item_number:$("#a_item").value||null,p_asin:$("#a_asin")?.value||null,p_title:$("#a_title").value||null});if(error){$("#matchMsg").textContent=error.message;return}$("#matches").innerHTML=(data||[]).map(r=>`<div class="card"><b>${esc(r.title)}</b> <span class="muted">${esc(r.match_reason)}</span><div class="muted">${esc(r.identifiers)} ${esc(r.asins)}</div><button data-pick="${r.product_id}" data-title="${esc(r.title)}">Use Existing Product</button></div>`).join("")||'<span class="muted">No match. A new product will be created.</span>';document.querySelectorAll("[data-pick]").forEach(b=>b.onclick=()=>{selectedProduct=Number(b.dataset.pick);$("#a_title").value=b.dataset.title;$("#matches").innerHTML='<span class="good">Existing product selected.</span>'})}
+$("#findProduct").onclick=async()=>{const {data,error}=await sb.rpc("find_product_candidates_v2",{p_upc:$("#a_upc").value||null,p_fnsku:$("#a_fnsku").value||null,p_item_number:$("#a_item").value||null,p_asin:$("#a_asin")?.value||null,p_title:$("#a_title").value||null});if(error){$("#matchMsg").textContent=error.message;return}$("#matchMsg").textContent=(data||[]).length>1?(data.length+" matches. Choose the right one."):"";$("#matches").innerHTML=(data||[]).map(r=>`<div class="card"><b>${esc(r.title)}</b> <span class="muted">${esc(r.match_reason)}</span><div class="muted">${esc(r.identifiers)} ${esc(r.asins)}</div><div class="muted">${r.active_pallets?"Active pallets: "+esc(r.active_pallets):"No active pallet"}</div><button data-pick="${r.product_id}" data-title="${esc(r.title)}">Use Existing Product</button></div>`).join("")||'<span class="muted">No match. A new product will be created.</span>';document.querySelectorAll("[data-pick]").forEach(b=>b.onclick=()=>{selectedProduct=Number(b.dataset.pick);$("#a_title").value=b.dataset.title;$("#matches").innerHTML='<span class="good">Existing product selected.</span>'})}
+// FNSKU lookup: runs when the Owner enters an ASIN and only on the PC that runs the SC Goods connector. It fills the FNSKU box
+// only when Amazon lists exactly one FNSKU and the box is empty; with several, the Owner chooses. Employees have no ASIN field.
+async function lookupFnsku(asin){
+  const ticket=++fnskuTicket,box=$("#fnskuPanel"),live_=()=>ticket===fnskuTicket&&$("#addModal").classList.contains("open")&&$("#a_asin").value.trim().toUpperCase()===asin;
+  if(role!=="owner"||!/^[A-Z0-9]{10}$/.test(asin)){box.textContent="";return}
+  box.textContent="Looking up FNSKUs for "+asin+"...";
+  try{
+    const {data:{session}}=await sb.auth.getSession();if(!session)throw new Error("Sign in again.");
+    const ask=async()=>{const ctl=new AbortController(),t=setTimeout(()=>ctl.abort(),30000);try{const res=await fetch("http://127.0.0.1:8765/api/fnsku/"+encodeURIComponent(asin),{cache:"no-store",signal:ctl.signal,headers:{Accept:"application/json",Authorization:"Bearer "+session.access_token}});const body=await res.json().catch(()=>null);if(!res.ok)throw new Error(body&&body.error||("HTTP "+res.status));return body}finally{clearTimeout(t)}};
+    let res;try{res=await ask()}catch(e){if(!/being checked/i.test(String(e.message)))throw e;await new Promise(ok=>setTimeout(ok,11000));if(!live_())return;res=await ask()}
+    if(!live_())return;
+    const rows=(res.rows||[]).filter(x=>x.fnsku),live=[...new Set(rows.filter(x=>x.source==="listing").map(x=>x.fnsku))],f=$("#a_fnsku");
+    let note=res.listingError?`Amazon could not confirm the listings (${res.listingError}). Saved records are shown.`:"";
+    if(!rows.length)note=(note||"Amazon returned no listing for this ASIN.")+" No FNSKU is known. Nothing was filled in.";
+    else if(live.length===1&&!f.value.trim()){f.value=live[0];note=(note?note+" ":"")+"FNSKU filled in from the Amazon listing."}
+    else if(live.length===1)note=(note?note+" ":"")+"The FNSKU box already has a value; it was not changed.";
+    else note=(note?note+" ":"")+rows.length+(rows.length===1?" listing":" listings")+" found. Choose the one on this stock, or leave it blank.";
+    box.innerHTML=`<div>${esc(note)}</div>`+rows.map(x=>`<div class="row" style="margin-top:3px"><b>${esc(x.fnsku)}</b> <span>${esc(x.sku)}</span> <span>${esc(x.source==="listing"?(x.status||"Listed"):x.listed?"Saved FNSKU; Amazon did not confirm it":"Saved, no current listing")}</span> <button type="button" data-use-fnsku="${esc(x.fnsku)}">Use</button></div>`).join("");
+    box.querySelectorAll("[data-use-fnsku]").forEach(b=>b.onclick=()=>{$("#a_fnsku").value=b.dataset.useFnsku});
+  }catch(e){if(live_())box.textContent="FNSKU lookup is available on the Owner's PC with the SC Goods connector running ("+e.message+"). Nothing was changed."}
+}
+$("#a_asin").onchange=()=>lookupFnsku($("#a_asin").value.trim().toUpperCase());
 $("#a_location").onblur=async()=>{if(addTarget)return;const {data}=await sb.rpc("check_location",{p_location:$("#a_location").value});$("#locWarn").textContent=data?.length?"⚠ Location already in use: "+data.map(x=>"Pallet "+x.pallet_number+" "+x.title).join("; "):""}
 $("#savePallet").onclick=async()=>{
   if(savingPallet)return;
@@ -535,21 +576,63 @@ $("#savePallet").onclick=async()=>{
   if(cases==null){alert("Cases must be a whole number (0 or more).");return}
   if(casepack==null||casepack<1){alert("Casepack must be a whole number of 1 or more.");return}
   if(!addTarget&&!$("#a_location").value.trim()){alert("Location is required.");return}
+  const numberText=role==="owner"&&!addTarget?$("#a_number").value.trim():"",palletNumber=numberText===""?null:wholeOrNull(numberText);
+  if(numberText!==""&&(palletNumber==null||palletNumber<1)){alert("Pallet number must be a whole number of 1 or more.");return}
   const p={p_product_id:selectedProduct,p_upc:$("#a_upc").value||null,p_fnsku:$("#a_fnsku").value||null,p_other_identifier:null,p_item_number:$("#a_item").value||null,p_title:$("#a_title").value||null,p_asins:role==="owner"&&$("#a_asin").value?[$("#a_asin").value.trim()]:null,p_cases:cases,p_casepack:casepack,p_case_box_dimensions:$("#a_case_dims").value||null,p_case_box_weight_lb:Number($("#a_case_weight").value)||null,p_item_dimensions:$("#a_itemdims").value||null,p_item_weight_lb:Number($("#a_item_weight").value)||null,p_country_of_origin:$("#a_country").value||null,p_label_status:$("#a_label").value};
   const btn=$("#savePallet");savingPallet=true;btn.disabled=true;btn.textContent="Saving…";
   try{
     const {error}=addTarget
       ?await sb.rpc("add_pallet_line_v1",{...p,p_pallet_id:addTarget.pallet_id,p_expected_version:addTarget.row_version})
-      :await sb.rpc("create_pallet_v2",{...p,p_location:$("#a_location").value});
+      :role==="owner"
+        ?await sb.rpc("create_pallet_v3",{...p,p_location:$("#a_location").value,p_pallet_number:palletNumber})
+        :await sb.rpc("create_pallet_v2",{...p,p_location:$("#a_location").value});
     if(error){alert(error.message+(String(error.message).includes(STALE)?"\n\nClose this window and refresh, then try again.":""));return}
     close("addModal");addTarget=null;await load($("#search").value);
   }finally{savingPallet=false;btn.disabled=false;btn.textContent="Save Pallet"}
 }
 // Prompts: Cancel or an invalid number stops before anything is sent.
 function askWhole(label,min){const s=prompt(label);if(s==null)return null;const n=wholeOrNull(s);if(n==null||n<min){alert(label+" must be a whole number"+(min>0?" of "+min+" or more.":" (0 or more)."));return null}return n}
-async function duplicateLine(id,title){const loc=prompt("New location for "+title);if(!loc||!loc.trim())return;const cases=askWhole("Cases",0);if(cases==null)return;const cp=askWhole("Casepack",1);if(cp==null)return;const {error}=await sb.rpc("duplicate_pallet_line",{p_source_line_id:Number(id),p_location:loc,p_cases:cases,p_casepack:cp});if(error)alert(error.message);else load($("#search").value)}
+// Duplicate adds new stock. Only Location and Number of Cases are entered; the server copies everything else from the source line
+// and leaves the source untouched. Each request is saved in this browser before it is sent (ids, location, cases; no costs) and
+// removed once its outcome is known. A request whose answer was lost can only be resent unchanged, which cannot create a second pallet.
+const DUP_PREFIX="scg.portal.pendingDuplicate.v1.";
+function dupStored(id){try{for(const k of Object.keys(localStorage)){if(!k.startsWith(DUP_PREFIX))continue;const p=JSON.parse(localStorage.getItem(k));if(p&&Number(p.lineId)===Number(id)&&p.user===userId)return p}}catch(e){}return null}
+function dupDone(p){try{localStorage.removeItem(DUP_PREFIX+p.requestId)}catch(e){}}
+function duplicateLine(id,title){
+  const r=current.find(x=>Number(x.line_id)===Number(id));let pending=dupStored(id),busyDup=false;
+  $("#smTitle").textContent=`Duplicate pallet ${r?r.pallet_number:""}`;
+  $("#smBody").innerHTML=`<p class="muted">${esc(title)}${r&&r.casepack?" \u2014 casepack "+esc(fmt(r.casepack)):""}</p>`+(pending?`<p class="warn">The last duplicate of this pallet (${esc(fmt(pending.cases))} cases at ${esc(pending.location)}) had no answer. Check it first: this resends the same request and cannot create a second pallet.</p>`:`<div class="grid2"><div><label>Location</label><input id="dupLocation" maxlength="60" autocomplete="off"></div><div><label>Number of Cases</label><input id="dupCases" type="number" min="1" step="1"></div></div>`)+`<p id="dupWarn" class="warn"></p><div class="row"><button id="dupCancel">Cancel</button><button id="dupSave" class="primary">${pending?"Check last duplicate":"Create pallet"}</button></div>`;
+  $("#simpleModal").classList.add("open");if(!pending)$("#dupLocation").focus();
+  $("#dupCancel").onclick=()=>{if(!busyDup)close("simpleModal")};
+  $("#dupSave").onclick=async()=>{
+    if(busyDup)return;
+    const msg=$("#dupWarn"),btn=$("#dupSave");
+    busyDup=true;btn.disabled=true;msg.textContent="";
+    try{
+      if(!pending){
+        const loc=$("#dupLocation").value.trim().toUpperCase(),cases=wholeOrNull($("#dupCases").value);
+        if(!loc){msg.textContent="Location is required.";return}
+        if(cases==null||cases<1){msg.textContent="Number of Cases must be a whole number of 1 or more.";return}
+        const {data:hits}=await sb.rpc("check_location",{p_location:loc});
+        if(hits&&hits.length&&!confirm(`Location ${loc} is already in use by pallet(s) ${[...new Set(hits.map(x=>x.pallet_number))].join(", ")}. Continue?`))return;
+        const request={requestId:crypto.randomUUID(),user:userId,lineId:Number(id),location:loc,cases};
+        localStorage.setItem(DUP_PREFIX+request.requestId,JSON.stringify(request));
+        pending=request;
+      }
+      const p=pending,{data,error,status}=await sb.rpc("duplicate_pallet_line_v2",{p_request_id:p.requestId,p_source_line_id:p.lineId,p_location:p.location,p_cases:p.cases});
+      if(error){
+        // Only the database's own refusal of the request itself settles it. A lost answer, an authorization failure or another
+        // user's retry says nothing about whether the first send was saved.
+        if((status===400||status===409)&&/^[0-9A-Z]{5}$/.test(String(error.code||""))&&!/different duplicate/i.test(error.message)){dupDone(p);pending=null;msg.textContent=error.message}
+        else{msg.textContent=`No answer (${error.message}). Press Check last duplicate: it cannot create a second pallet.`;btn.textContent="Check last duplicate"}
+        return;
+      }
+      dupDone(p);pending=null;close("simpleModal");await load($("#search").value);alert(`${data.replayed?"The last duplicate had been saved: pallet":"Created pallet"} ${data.pallet_number} at ${data.location} with ${fmt(data.units)} units.`);
+    }catch(e){msg.textContent=e.message}finally{busyDup=false;btn.disabled=false}
+  };
+}
 async function reactivate(pid,lid,title){const r=current.find(x=>Number(x.line_id)===Number(lid));if(!r)return;const loc=prompt("Current location for "+title);if(!loc||!loc.trim())return;const cases=askWhole("Cases found",0);if(cases==null)return;const cp=askWhole("Casepack",1);if(cp==null)return;const {error}=await sb.rpc("reactivate_pallet_line_v2",{p_pallet_id:Number(pid),p_line_id:Number(lid),p_expected_version:r.row_version,p_new_location:loc,p_cases:cases,p_casepack:cp});if(error){alert(error.message);if(String(error.message).includes(STALE))load($("#search").value)}else load($("#search").value)}
-async function history(pid){const {data,error}=await sb.rpc("get_pallet_history_v2",{p_pallet_id:Number(pid)});$("#smTitle").textContent="Pallet History";$("#smBody").innerHTML=error?esc(error.message):(data||[]).map(x=>`<div class="card"><b>${new Date(x.created_at).toLocaleString()}</b><div class="muted">${esc(x.actor_role||"")}</div><p>${esc(x.summary||"Updated.")}</p></div>`).join("")||'<p class="muted">No history yet.</p>';$("#simpleModal").classList.add("open")}
+async function history(pid){const gen=authGen,{data,error}=await sb.rpc("get_pallet_history_v2",{p_pallet_id:Number(pid)});if(gen!==authGen)return;$("#smTitle").textContent="Pallet History";$("#smBody").innerHTML=error?esc(error.message):(data||[]).map(x=>`<div class="card"><b>${new Date(x.created_at).toLocaleString()}</b><div class="muted">${esc(x.actor_role||"")}</div><p>${esc(x.summary||"Updated.")}</p></div>`).join("")||'<p class="muted">No history yet.</p>';$("#simpleModal").classList.add("open")}
 enter();
 </script>
 </body></html>
