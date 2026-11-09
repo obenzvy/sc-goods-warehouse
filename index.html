@@ -81,6 +81,7 @@ body.owner th:nth-child(1),body.owner td:nth-child(1){width:4%}body.owner th:nth
   <div class="grid"><div><label>Item dimensions (L×W×H)</label><input id="a_itemdims" placeholder="10.9x8.5x4.0"></div><div><label>Item weight (lb)</label><input id="a_item_weight" type="number" step=".01"></div><div><label>Country of origin</label><input id="a_country"></div></div>
   <div class="measurement-note"><b>Amazon comparison:</b> only the warehouse-entered individual item dimensions/weight are compared with Amazon's individual item/package measurements.</div>
 
+  <p id="saveMsg" class="warn"></p>
   <div class="row" style="margin-top:14px"><button data-close="addModal">Cancel</button><button id="savePallet" class="primary">Save Pallet</button></div>
 </div></div>
 
@@ -539,14 +540,39 @@ updateViewButtons();
 $("#search").oninput=e=>{clearTimeout(window._t);window._t=setTimeout(()=>load(e.target.value),250)};$("#refresh").onclick=()=>load($("#search").value);
 // Add Pallet modal: a new pallet (target null) or another product on an existing active pallet (target = its row).
 function openAdd(target){
-  addTarget=target||null;selectedProduct=null;$("#matches").innerHTML="";$("#matchMsg").textContent="";$("#locWarn").textContent="";
+  addTarget=target||null;selectedProduct=null;savedP=null;found=[];autoFilled={};$("#a_title").readOnly=false;$("#a_item_weight").readOnly=false;$("#saveMsg").textContent="";$("#matches").innerHTML="";$("#matchMsg").textContent="";$("#locWarn").textContent="";
   $("#addTitle").textContent=addTarget?`Add product to pallet ${addTarget.pallet_number}`:"Add Pallet";
   $("#addTargetInfo").textContent=addTarget?`Pallet ${addTarget.pallet_number} at ${addTarget.location||"(no location)"}. The new product line uses this pallet's number and location.`:"";
   $("#a_location_box").classList.toggle("hide",!!addTarget);$("#a_number_box").classList.toggle("hide",!!addTarget);document.querySelectorAll("#addModal input").forEach(i=>{i.value=""});$("#a_label").selectedIndex=0;fnskuTicket++;$("#fnskuPanel").textContent="";
   $("#addModal").classList.add("open");
 }
 $("#addBtn").onclick=()=>openAdd(null);
-$("#findProduct").onclick=async()=>{const {data,error}=await sb.rpc("find_product_candidates_v2",{p_upc:$("#a_upc").value||null,p_fnsku:$("#a_fnsku").value||null,p_item_number:$("#a_item").value||null,p_asin:$("#a_asin")?.value||null,p_title:$("#a_title").value||null});if(error){$("#matchMsg").textContent=error.message;return}$("#matchMsg").textContent=(data||[]).length>1?(data.length+" matches. Choose the right one."):"";$("#matches").innerHTML=(data||[]).map(r=>`<div class="card"><b>${esc(r.title)}</b> <span class="muted">${esc(r.match_reason)}</span><div class="muted">${esc(r.identifiers)} ${esc(r.asins)}</div><div class="muted">${r.active_pallets?"Active pallets: "+esc(r.active_pallets):"No active pallet"}</div><button data-pick="${r.product_id}" data-title="${esc(r.title)}">Use Existing Product</button></div>`).join("")||'<span class="muted">No match. A new product will be created.</span>';document.querySelectorAll("[data-pick]").forEach(b=>b.onclick=()=>{selectedProduct=Number(b.dataset.pick);$("#a_title").value=b.dataset.title;$("#matches").innerHTML='<span class="good">Existing product selected.</span>'})}
+// Find Existing Product. Choosing a match fills every empty box with the saved product's values; anything typed stays.
+// Casepack and carton come together from the product's most recent pallet. The name, and an item weight already saved,
+// belong to the product and are not changed here. "Choose another product" undoes the choice.
+let savedP=null,found=[],autoFilled={};
+const numText=v=>v==null||v===""?null:String(Number(v));
+// Every box filled from a saved product is remembered with what it held before. Undoing a choice (Choose another
+// product, or a new Find) puts back only boxes still holding the filled value; anything the user typed stays.
+function setAuto(id,v){const e=$("#"+id);if(!e)return;if(!(id in autoFilled))autoFilled[id]={before:e.value,filled:v};else autoFilled[id].filled=v;e.value=v}
+function fillBox(id,v){const e=$("#"+id);if(e&&v!=null&&v!==""&&!e.value.trim())setAuto(id,v)}
+function clearAutoFilled(){for(const [id,a] of Object.entries(autoFilled)){const e=$("#"+id);if(e&&e.value===a.filled)e.value=a.before}autoFilled={}}
+function savedLine(r){return [r.casepack!=null?"Casepack "+numText(r.casepack)+(r.carton_from_pallet?" (pallet "+r.carton_from_pallet+")":""):"",r.carton_dimensions?"Carton "+r.carton_dimensions+(r.carton_weight_lb!=null?", "+numText(r.carton_weight_lb)+" lb":""):"",r.item_dimensions?"Item "+r.item_dimensions:""].filter(Boolean).join(" · ")||"No saved measurements"}
+function pickProduct(r){
+  if(!r)return;
+  if(selectedProduct!=null)unpickProduct();
+  selectedProduct=Number(r.product_id);savedP=r;$("#saveMsg").textContent="";
+  setAuto("a_title",r.title||"");$("#a_title").readOnly=true;
+  fillBox("a_upc",r.upc);fillBox("a_fnsku",r.fnsku);fillBox("a_item",r.item_number);if(role==="owner")fillBox("a_asin",r.asin);
+  fillBox("a_casepack",numText(r.casepack));fillBox("a_case_dims",r.carton_dimensions);fillBox("a_case_weight",numText(r.carton_weight_lb));
+  fillBox("a_itemdims",r.item_dimensions);fillBox("a_country",r.country_of_origin);
+  const w=$("#a_item_weight");if(r.item_weight_lb!=null){setAuto("a_item_weight",numText(r.item_weight_lb));w.readOnly=true}else w.readOnly=false;
+  $("#matchMsg").textContent="";
+  $("#matches").innerHTML=`<span class="good">Saved product filled in: ${esc(r.title)}. Change anything that is different.</span> <button type="button" id="unpick">Choose another product</button>`;
+  $("#unpick").onclick=unpickProduct;
+}
+function unpickProduct(){clearAutoFilled();selectedProduct=null;savedP=null;$("#a_title").readOnly=false;$("#a_item_weight").readOnly=false;$("#matches").innerHTML="";$("#saveMsg").textContent=""}
+$("#findProduct").onclick=async()=>{if(selectedProduct!=null)unpickProduct();const {data,error}=await sb.rpc("find_product_candidates_v3",{p_upc:$("#a_upc").value||null,p_fnsku:$("#a_fnsku").value||null,p_item_number:$("#a_item").value||null,p_asin:$("#a_asin")?.value||null,p_title:$("#a_title").value||null});if(error){$("#matchMsg").textContent=error.message;return}found=data||[];$("#matchMsg").textContent=found.length>1?(found.length+" matches. Choose the right one."):"";$("#matches").innerHTML=found.map((r,i)=>`<div class="card"><b>${esc(r.title)}</b> <span class="muted">${esc(r.match_reason)}</span><div class="muted">${esc(r.identifiers)} ${esc(r.asins)}</div><div class="muted">${esc(savedLine(r))}</div><div class="muted">${r.active_pallets?"Active pallets: "+esc(r.active_pallets):"No active pallet"}</div><button data-pick="1" data-i="${i}">Use Existing Product</button></div>`).join("")||'<span class="muted">No match. A new product will be created.</span>';document.querySelectorAll("[data-pick]").forEach(b=>b.onclick=()=>pickProduct(found[Number(b.dataset.i)]))}
 // FNSKU lookup: runs when the Owner enters an ASIN and only on the PC that runs the SC Goods connector. It fills the FNSKU box
 // only when Amazon lists exactly one FNSKU and the box is empty; with several, the Owner chooses. Employees have no ASIN field.
 async function lookupFnsku(asin){
@@ -570,7 +596,9 @@ async function lookupFnsku(asin){
 }
 $("#a_asin").onchange=()=>lookupFnsku($("#a_asin").value.trim().toUpperCase());
 $("#a_location").onblur=async()=>{if(addTarget)return;const {data}=await sb.rpc("check_location",{p_location:$("#a_location").value});$("#locWarn").textContent=data?.length?"⚠ Location already in use: "+data.map(x=>"Pallet "+x.pallet_number+" "+x.title).join("; "):""}
-$("#savePallet").onclick=async()=>{
+const keepText=(id,k)=>{const v=$("#"+id).value.trim();if(!v)return null;return savedP&&savedP[k]!=null&&String(savedP[k]).trim().toLowerCase()===v.toLowerCase()?null:v};
+const keepNum=(id,k)=>{const v=Number($("#"+id).value)||null;if(v==null)return null;return savedP&&savedP[k]!=null&&Number(savedP[k])===v?null:v};
+$("#savePallet").onclick=async()=>{$("#saveMsg").textContent="";
   if(savingPallet)return;
   const cases=wholeOrNull($("#a_cases").value),casepack=wholeOrNull($("#a_casepack").value);
   if(cases==null){alert("Cases must be a whole number (0 or more).");return}
@@ -578,7 +606,7 @@ $("#savePallet").onclick=async()=>{
   if(!addTarget&&!$("#a_location").value.trim()){alert("Location is required.");return}
   const numberText=role==="owner"&&!addTarget?$("#a_number").value.trim():"",palletNumber=numberText===""?null:wholeOrNull(numberText);
   if(numberText!==""&&(palletNumber==null||palletNumber<1)){alert("Pallet number must be a whole number of 1 or more.");return}
-  const p={p_product_id:selectedProduct,p_upc:$("#a_upc").value||null,p_fnsku:$("#a_fnsku").value||null,p_other_identifier:null,p_item_number:$("#a_item").value||null,p_title:$("#a_title").value||null,p_asins:role==="owner"&&$("#a_asin").value?[$("#a_asin").value.trim()]:null,p_cases:cases,p_casepack:casepack,p_case_box_dimensions:$("#a_case_dims").value||null,p_case_box_weight_lb:Number($("#a_case_weight").value)||null,p_item_dimensions:$("#a_itemdims").value||null,p_item_weight_lb:Number($("#a_item_weight").value)||null,p_country_of_origin:$("#a_country").value||null,p_label_status:$("#a_label").value};
+  const p={p_product_id:selectedProduct,p_upc:$("#a_upc").value||null,p_fnsku:$("#a_fnsku").value||null,p_other_identifier:null,p_item_number:$("#a_item").value||null,p_title:$("#a_title").value||null,p_asins:role==="owner"&&$("#a_asin").value?[$("#a_asin").value.trim()]:null,p_cases:cases,p_casepack:casepack,p_case_box_dimensions:keepText("a_case_dims","product_carton_dimensions"),p_case_box_weight_lb:keepNum("a_case_weight","product_carton_weight_lb"),p_item_dimensions:keepText("a_itemdims","item_dimensions"),p_item_weight_lb:keepNum("a_item_weight","item_weight_lb"),p_country_of_origin:keepText("a_country","country_of_origin"),p_label_status:$("#a_label").value};
   const btn=$("#savePallet");savingPallet=true;btn.disabled=true;btn.textContent="Saving…";
   try{
     const {error}=addTarget
@@ -586,7 +614,7 @@ $("#savePallet").onclick=async()=>{
       :role==="owner"
         ?await sb.rpc("create_pallet_v3",{...p,p_location:$("#a_location").value,p_pallet_number:palletNumber})
         :await sb.rpc("create_pallet_v2",{...p,p_location:$("#a_location").value});
-    if(error){alert(error.message+(String(error.message).includes(STALE)?"\n\nClose this window and refresh, then try again.":""));return}
+    if(error){if(/belongs to another product/.test(String(error.message))){$("#saveMsg").textContent=error.message;return}alert(error.message+(String(error.message).includes(STALE)?"\n\nClose this window and refresh, then try again.":""));return}
     close("addModal");addTarget=null;await load($("#search").value);
   }finally{savingPallet=false;btn.disabled=false;btn.textContent="Save Pallet"}
 }
