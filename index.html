@@ -542,7 +542,7 @@ function openAdd(target){
   addTarget=target||null;selectedProduct=null;$("#matches").innerHTML="";$("#matchMsg").textContent="";$("#locWarn").textContent="";
   $("#addTitle").textContent=addTarget?`Add product to pallet ${addTarget.pallet_number}`:"Add Pallet";
   $("#addTargetInfo").textContent=addTarget?`Pallet ${addTarget.pallet_number} at ${addTarget.location||"(no location)"}. The new product line uses this pallet's number and location.`:"";
-  $("#a_location_box").classList.toggle("hide",!!addTarget);$("#a_number_box").classList.toggle("hide",!!addTarget);$("#a_number").value="";fnskuTicket++;$("#fnskuPanel").textContent="";
+  $("#a_location_box").classList.toggle("hide",!!addTarget);$("#a_number_box").classList.toggle("hide",!!addTarget);document.querySelectorAll("#addModal input").forEach(i=>{i.value=""});$("#a_label").selectedIndex=0;fnskuTicket++;$("#fnskuPanel").textContent="";
   $("#addModal").classList.add("open");
 }
 $("#addBtn").onclick=()=>openAdd(null);
