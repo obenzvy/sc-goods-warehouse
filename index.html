@@ -22,6 +22,9 @@ body.owner th:nth-child(1),body.owner td:nth-child(1){width:4%}body.owner th:nth
     .locChip{padding:5px 10px;margin:3px 4px 0 0;border:1px solid var(--blue);border-radius:999px;color:#0f4f80;background:#fff;font-size:13px}.hide{display:none!important}.ownerOnly{display:none}body.owner .ownerOnly{display:block}body.owner td.ownerOnly,body.owner th.ownerOnly{display:table-cell}
     .modal{position:fixed;inset:0;background:#0006;display:none;align-items:center;justify-content:center;padding:20px;z-index:20}.modal.open{display:flex}.modalbox{background:#fff;max-width:950px;width:100%;max-height:92vh;overflow:auto;border-radius:12px;padding:18px}
     .section{font-weight:700;margin:15px 0 8px;padding-bottom:5px;border-bottom:1px solid #e5e7eb}.measurement-note{background:#eef6ff;border-left:4px solid var(--blue);padding:10px;margin-top:10px}.danger{color:#a11}
+    .cards{display:none}.pcard{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px}.pcard .top{display:flex;align-items:baseline;gap:8px}.pcard .num{font-size:22px;font-weight:700}.pcard .loc{flex:1;text-align:right;font-weight:700}.pcard .btns{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:8px}
+    #scanBox{position:fixed;inset:0;background:#000;z-index:40;display:none;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:12px}#scanBox.open{display:flex}#scanBox video{width:100%;max-width:640px;max-height:70vh;object-fit:cover;border-radius:8px}#scanMsg{color:#fff;margin:0;text-align:center}
+    @media(max-width:700px){.tablewrap{display:none}.cards{display:flex;flex-direction:column;gap:10px}#exportBtn{display:none}input,select,button{font-size:16px}.toolbar button,.toolbar input{padding:12px}.pcard button{min-height:44px}.modal{padding:0}.modalbox{max-height:100vh;height:100vh;border-radius:0}}
     @media(max-width:900px){.grid,.grid2{grid-template-columns:1fr}.wrap{padding:10px}.toolbar{flex-wrap:wrap}.toolbar input{min-width:100%}}
   </style>
 </head>
@@ -39,7 +42,7 @@ body.owner th:nth-child(1),body.owner td:nth-child(1){width:4%}body.owner th:nth
     <div id="unassigned" class="card hide"><b>This account is signed in but has not been assigned an Owner or Warehouse role yet.</b><p class="muted">Role assignment only needs to be done once.</p></div>
     <div id="roleCheck" class="card hide"><b>Your access could not be confirmed right now.</b> <span class="muted">You are still signed in. This retries by itself.</span> <button id="roleRetry">Try now</button></div>
 
-    <div class="toolbar"><button id="addBtn" class="primary">+ Add Pallet</button><div class="viewToggle"><button id="activeView" class="primary">Active</button><button id="archivedView">Archived</button></div><input id="search" placeholder="Search UPC, FNSKU, item #, ASIN, pallet, location or title"><button id="exportBtn">Export CSV</button><button id="refresh">Refresh</button></div>
+    <div class="toolbar"><button id="addBtn" class="primary">+ Add Pallet</button><div class="viewToggle"><button id="activeView" class="primary">Active</button><button id="archivedView">Archived</button></div><input id="search" placeholder="Search UPC, FNSKU, item #, ASIN, pallet, location or title"><button id="scanSearch" type="button" class="primary">Scan</button><button id="exportBtn">Export CSV</button><button id="refresh">Refresh</button></div>
     <p id="loadMsg" class="warn"></p>
     <p id="okMsg" class="good"></p>
     <div class="tablewrap"><table><thead><tr>
@@ -58,6 +61,7 @@ body.owner th:nth-child(1),body.owner td:nth-child(1){width:4%}body.owner th:nth
       <th class="ownerOnly sortable colTotal" data-sort="pallet_value">Pallet total <span class="sortArrow"></span></th>
       <th class="colActions">Actions</th>
     </tr></thead><tbody id="tbody"></tbody></table></div>
+    <div id="cards" class="cards"></div>
   </div>
 </div>
 
@@ -65,7 +69,7 @@ body.owner th:nth-child(1),body.owner td:nth-child(1){width:4%}body.owner th:nth
   <div class="row"><h2 id="addTitle" style="flex:1">Add Pallet</h2><button data-close="addModal">✕</button></div>
   <p id="addTargetInfo" class="muted"></p>
   <div class="section">Identify product</div>
-  <div class="grid"><div><label>UPC</label><input id="a_upc"></div><div><label>FNSKU</label><input id="a_fnsku"></div><div><label>Item #</label><input id="a_item"></div><div class="ownerOnly"><label>ASIN</label><input id="a_asin"></div></div>
+  <div class="grid"><div><label>UPC</label><div class="row"><input id="a_upc"><button type="button" id="scanUpc">Scan</button></div></div><div><label>FNSKU</label><input id="a_fnsku"></div><div><label>Item #</label><input id="a_item"></div><div class="ownerOnly"><label>ASIN</label><input id="a_asin"></div></div>
   <div id="fnskuPanel" class="muted" aria-live="polite"></div>
   <div style="margin-top:8px"><label>Description</label><input id="a_title"></div>
   <div class="row" style="margin:10px 0"><button id="findProduct">Find Existing Product</button><span id="matchMsg" class="muted"></span></div><div id="matches"></div>
@@ -87,6 +91,7 @@ body.owner th:nth-child(1),body.owner td:nth-child(1){width:4%}body.owner th:nth
   <div class="row" style="margin-top:14px"><button data-close="addModal">Cancel</button><button id="savePallet" class="primary">Save Pallet</button></div>
 </div></div>
 
+<div id="scanBox"><video id="scanVideo" playsinline muted></video><p id="scanMsg"></p><button id="scanCancel" type="button">Cancel</button></div>
 <div id="simpleModal" class="modal"><div class="modalbox"><div class="row"><h2 id="smTitle" style="flex:1"></h2><button data-close="simpleModal">✕</button></div><div id="smBody"></div></div></div>
 
 
@@ -257,7 +262,7 @@ async function load(q,view=viewMode){
   // A failed refresh leaves the rows of this view on screen and says so.
   if(error&&current.length&&view===viewMode){$("#loadMsg").textContent="Could not refresh: "+error.message;return}
   viewMode=view;updateViewButtons();
-  if(error){$("#tbody").innerHTML=`<tr><td colspan="12">${esc(error.message)}</td></tr>`;return}
+  if(error){current=[];$("#tbody").innerHTML=`<tr><td colspan="12">${esc(error.message)}</td></tr>`;$("#cards").innerHTML=`<p class="warn">${esc(error.message)}</p>`;return}
   $("#loadMsg").textContent="";
   current=data||[];
   renderRows();
@@ -295,6 +300,14 @@ function renderRows(){
       </div></td>
     </tr>`;
   }).join("");
+  $("#cards").innerHTML=sortedRows().map(r=>{
+    // Phone Edit only on active pallets in the Active view (inactive lines appear in Archived and must not be saved there).
+    const operational=r.pallet_status==="active"&&viewMode==="active";
+    return `<div class="pcard"><div class="top"><span class="num">${esc(r.pallet_number)}</span><span class="loc">${esc(r.location||"\u2014")}</span></div>
+      <div>${esc(r.title)}</div><div class="muted">${fmt(r.cases)} cases \u00d7 ${fmt(r.casepack)} \u00b7 <b>${fmt(r.available_units)} units</b></div>
+      <div class="btns">${operational?`<button class="primary" data-cedit="${r.line_id}">Edit</button>`:""}<button data-hist="${r.pallet_id}">History</button></div></div>`;
+  }).join("")||'<p class="muted">No pallets found.</p>';
+  document.querySelectorAll("[data-cedit]").forEach(b=>b.onclick=()=>openEditSheet(current.find(x=>Number(x.line_id)===Number(b.dataset.cedit))));
   bindRows();
   updateSortIndicators();
 }
@@ -486,11 +499,23 @@ async function saveInlineRow(line){
     const el=tr.querySelector(`[data-field="${f}"]`);
     return el?el.value.trim():fallback;
   };
+  const btn=tr.querySelector("[data-save]");
+  const args=rowArgs(r,val);
+  if(!Number.isFinite(args.p_pallet_number)){alert("Enter a valid pallet number.");return}
+  btn.disabled=true;btn.textContent="Saving…";
+  const {error}=await sb.rpc("save_inventory_row_v3",args);
+  if(error){
+    if(String(error.message).includes(STALE)){alert(error.message+"\n\nThe latest data will now be loaded. Please enter your change again.");await load($("#search").value);return}
+    btn.disabled=false;btn.textContent="Save";alert(error.message);return
+  }
+  await load($("#search").value);
+}
+// Arguments for save_inventory_row_v3 from any editor: val(field, fallback) returns the edited text or the fallback.
+function rowArgs(r,val){
   const num=(s,fallback=null)=>s==null?fallback:(s===""?null:Number(s));
   const owner=role==="owner";
-  const btn=tr.querySelector("[data-save]");
   const args={
-    p_line_id:Number(line),
+    p_line_id:Number(r.line_id),
     p_pallet_number:Number(val("pallet",r.pallet_number)),
     p_status:r.pallet_status,
     p_location:val("location",r.location||""),
@@ -506,16 +531,60 @@ async function saveInlineRow(line){
     p_case_box_weight_lb:num(val("case_weight",r.casepack_box_weight_lb),r.casepack_box_weight_lb),
     p_cost_per_unit:owner?num(val("cost",r.cost_per_unit),r.cost_per_unit):null
   };
-  if(!Number.isFinite(args.p_pallet_number)){alert("Enter a valid pallet number.");return}
   args.p_expected_version=r.row_version;
-  btn.disabled=true;btn.textContent="Saving…";
-  const {error}=await sb.rpc("save_inventory_row_v3",args);
-  if(error){
-    if(String(error.message).includes(STALE)){alert(error.message+"\n\nThe latest data will now be loaded. Please enter your change again.");await load($("#search").value);return}
-    btn.disabled=false;btn.textContent="Save";alert(error.message);return
-  }
-  await load($("#search").value);
+  return args;
 }
+// Phone edit sheet: the fields the desktop row lets this login edit, saved through the same function and rules.
+function openEditSheet(r){
+  if(!r||r.pallet_status!=="active"||viewMode!=="active")return;
+  const f=(id,label,value,mode="text")=>`<div><label>${label}</label><input id="${id}" inputmode="${mode}" value="${esc(raw(value))}"></div>`;
+  $("#smTitle").textContent=`Edit pallet ${r.pallet_number}`;
+  $("#smBody").innerHTML=`<p>${esc(r.title)}</p><div class="grid2">${f("es_pallet","Pallet number",r.pallet_number,"numeric")}${f("es_location","Location",r.location)}${f("es_available","Available units",r.available_units,"numeric")}${f("es_cases","Cases",r.cases,"numeric")}${f("es_casepack","Casepack",r.casepack,"numeric")}</div>
+    <details style="margin-top:10px"><summary>Measurements</summary><div class="grid2">${f("es_item_dims","Item L\u00d7W\u00d7H",r.warehouse_item_dimensions)}${f("es_item_weight","Item weight (lb)",r.warehouse_item_weight_lb,"decimal")}${f("es_case_dims","Carton L\u00d7W\u00d7H",r.casepack_box_dimensions)}${f("es_case_weight","Carton weight (lb)",r.casepack_box_weight_lb,"decimal")}</div></details>
+    <p class="muted">Change either Available units or Cases/Casepack in one save.</p><div class="row" style="margin-top:10px"><button type="button" id="esCancel">Cancel</button><button type="button" class="primary" id="esSave">Save</button></div>`;
+  $("#simpleModal").classList.add("open");
+  $("#esCancel").onclick=()=>close("simpleModal");
+  const map={pallet:"es_pallet",location:"es_location",available:"es_available",cases:"es_cases",casepack:"es_casepack",item_dims:"es_item_dims",item_weight:"es_item_weight",case_dims:"es_case_dims",case_weight:"es_case_weight"};
+  $("#esSave").onclick=async()=>{
+    const btn=$("#esSave");if(btn.disabled)return;
+    const args=rowArgs(r,(k,fallback)=>map[k]?$("#"+map[k]).value.trim():fallback);
+    if(!Number.isFinite(args.p_pallet_number)||args.p_pallet_number<1){alert("Enter a valid pallet number.");return}
+    btn.disabled=true;btn.textContent="Saving…";
+    const {error}=await sb.rpc("save_inventory_row_v3",args);
+    if(error){
+      if(String(error.message).includes(STALE)){alert(error.message+"\n\nThe latest data will now be loaded. Please enter your change again.");close("simpleModal");await load($("#search").value);return}
+      btn.disabled=false;btn.textContent="Save";alert(error.message);return
+    }
+    close("simpleModal");await load($("#search").value);
+  };
+}
+// Camera barcode scanning (ZXing in the browser; works in iPhone Safari and Android Chrome over https). The camera starts
+// only when Scan is pressed and stops after one read or Cancel. Search: the code goes into the search box. Add Pallet: into
+// UPC, then Find Existing Product runs.
+let scanCtl=null,scanTarget=null,scanTicket=0;
+async function startScan(target){
+  const ticket=++scanTicket;scanTarget=target;$("#scanMsg").textContent="Starting camera\u2026";$("#scanBox").classList.add("open");
+  try{
+    const {BrowserMultiFormatReader}=await import("https://esm.sh/@zxing/browser@0.1.5?deps=@zxing/library@0.21.3");
+    if(ticket!==scanTicket)return;
+    const reader=new BrowserMultiFormatReader();
+    const ctl=await reader.decodeFromConstraints({video:{facingMode:{ideal:"environment"}}},$("#scanVideo"),(res,err,c)=>{
+      if(!res||ticket!==scanTicket)return;
+      c.stop();scanCtl=null;$("#scanBox").classList.remove("open");gotScan(res.getText());
+    });
+    if(ticket!==scanTicket){ctl.stop();return}
+    scanCtl=ctl;$("#scanMsg").textContent="Point the camera at the barcode";
+  }catch(e){if(ticket===scanTicket)$("#scanMsg").textContent="Camera not available ("+(e&&e.message||e)+"). Cancel and type the number instead."}
+}
+function stopScan(){scanTicket++;try{scanCtl&&scanCtl.stop()}catch(e){}scanCtl=null;$("#scanBox").classList.remove("open")}
+function gotScan(text){
+  const v=String(text||"").trim();if(!v)return;
+  if(scanTarget==="upc"){$("#a_upc").value=v;$("#findProduct").click()}
+  else{$("#search").value=v;load(v)}
+}
+$("#scanSearch").onclick=()=>startScan("search");
+$("#scanUpc").onclick=()=>startScan("upc");
+$("#scanCancel").onclick=stopScan;
 document.querySelectorAll("th[data-sort]").forEach(th=>th.addEventListener("click",()=>{
   const key=th.dataset.sort;
   if(!discardOwnerEditor())return;
