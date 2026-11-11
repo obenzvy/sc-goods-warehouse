@@ -19,7 +19,7 @@ th:nth-child(1),td:nth-child(1){width:4.5%}th:nth-child(2),td:nth-child(2){width
 body.owner th:nth-child(1),body.owner td:nth-child(1){width:4%}body.owner th:nth-child(2),body.owner td:nth-child(2){width:5.5%}body.owner th:nth-child(3),body.owner td:nth-child(3){width:15%}body.owner th:nth-child(4),body.owner td:nth-child(4){width:7%}body.owner th:nth-child(5),body.owner td:nth-child(5){width:4.5%}body.owner th:nth-child(6),body.owner td:nth-child(6){width:4.5%}body.owner th:nth-child(7),body.owner td:nth-child(7){width:5%}body.owner th:nth-child(8),body.owner td:nth-child(8){width:7.5%}body.owner th:nth-child(9),body.owner td:nth-child(9){width:7%}body.owner .colLabel{width:6.5%}body.owner .colCost{width:5%}body.owner .colValue{width:5.5%}body.owner .colTotal{width:6.5%}body.owner .colActions{width:16.5%}
     body.owner #tbody td[data-edit-field] .displayCell.editable{cursor:pointer}body.owner #tbody td[data-edit-field] .displayCell.editable:hover{outline:1px dashed #1769aa}
     .ownerEditor{display:grid;gap:3px}.ownerEditor label{font-size:9px;margin:0;color:#53657a}.ownerEditor .edNote{font-size:9px;color:#65758b;line-height:1.2}.ownerEditor .edBtns{display:flex;gap:3px}.ownerEditor .edBtns button{padding:2px 6px;font-size:11px}td.dirtyCell{background:#ffe9a8}.missing{color:var(--warn);font-weight:700}
-    .hide{display:none!important}.ownerOnly{display:none}body.owner .ownerOnly{display:block}body.owner td.ownerOnly,body.owner th.ownerOnly{display:table-cell}
+    .locChip{padding:5px 10px;margin:3px 4px 0 0;border:1px solid var(--blue);border-radius:999px;color:#0f4f80;background:#fff;font-size:13px}.hide{display:none!important}.ownerOnly{display:none}body.owner .ownerOnly{display:block}body.owner td.ownerOnly,body.owner th.ownerOnly{display:table-cell}
     .modal{position:fixed;inset:0;background:#0006;display:none;align-items:center;justify-content:center;padding:20px;z-index:20}.modal.open{display:flex}.modalbox{background:#fff;max-width:950px;width:100%;max-height:92vh;overflow:auto;border-radius:12px;padding:18px}
     .section{font-weight:700;margin:15px 0 8px;padding-bottom:5px;border-bottom:1px solid #e5e7eb}.measurement-note{background:#eef6ff;border-left:4px solid var(--blue);padding:10px;margin-top:10px}.danger{color:#a11}
     @media(max-width:900px){.grid,.grid2{grid-template-columns:1fr}.wrap{padding:10px}.toolbar{flex-wrap:wrap}.toolbar input{min-width:100%}}
@@ -41,6 +41,7 @@ body.owner th:nth-child(1),body.owner td:nth-child(1){width:4%}body.owner th:nth
 
     <div class="toolbar"><button id="addBtn" class="primary">+ Add Pallet</button><div class="viewToggle"><button id="activeView" class="primary">Active</button><button id="archivedView">Archived</button></div><input id="search" placeholder="Search UPC, FNSKU, item #, ASIN, pallet, location or title"><button id="exportBtn">Export CSV</button><button id="refresh">Refresh</button></div>
     <p id="loadMsg" class="warn"></p>
+    <p id="okMsg" class="good"></p>
     <div class="tablewrap"><table><thead><tr>
       <th class="sortable" data-sort="pallet_number">Pallet <span class="sortArrow"></span></th>
       <th class="sortable" data-sort="location">Location <span class="sortArrow"></span></th>
@@ -70,8 +71,9 @@ body.owner th:nth-child(1),body.owner td:nth-child(1){width:4%}body.owner th:nth
   <div class="row" style="margin:10px 0"><button id="findProduct">Find Existing Product</button><span id="matchMsg" class="muted"></span></div><div id="matches"></div>
 
   <div class="section">Pallet</div>
-  <div class="grid"><div id="a_location_box"><label>Location *</label><input id="a_location"></div><div id="a_number_box" class="ownerOnly"><label>Pallet number</label><input id="a_number" type="number" min="1" step="1" placeholder="Automatic"></div><div><label>Cases *</label><input id="a_cases" type="number" min="0"></div><div><label>Casepack *</label><input id="a_casepack" type="number" min="1"></div><div><label>Label status</label><select id="a_label"><option>Original UPC / unlabeled</option><option>FNSKU labeled</option></select></div></div>
+  <div class="grid"><div id="a_location_box"><label>Location *</label><input id="a_location"></div><div id="a_number_box"><label>Pallet number</label><input id="a_number" type="number" min="1" step="1" placeholder="Automatic"><div id="numHint" class="muted"></div></div><div><label>Cases *</label><input id="a_cases" type="number" min="0"></div><div><label>Casepack *</label><input id="a_casepack" type="number" min="1"></div><div><label>Label status</label><select id="a_label"><option>Original UPC / unlabeled</option><option>FNSKU labeled</option></select></div></div>
   <p id="locWarn" class="warn"></p>
+  <div id="locChips"></div>
 
   <div class="section">Casepack carton — warehouse operations only</div>
   <div class="grid"><div><label>Carton dimensions (L×W×H)</label><input id="a_case_dims" placeholder="24x18x12"></div><div><label>Carton weight (lb)</label><input id="a_case_weight" type="number" step=".01"></div></div>
@@ -175,7 +177,7 @@ function editCell(td,r,field){
   const owner=role==="owner";
   const operational=owner||r.pallet_status==="active";
   let html="";
-  if(field==="pallet"){if(!owner)return;html=numInput("pallet",r.pallet_number)}
+  if(field==="pallet"){if(!operational)return;html=numInput("pallet",r.pallet_number)}
   else if(field==="location"){if(!operational)return;html=textInput("location",r.location||"")}
   else if(field==="product"){if(!owner)return;html=`${textInput("title",r.title)}<input class="cellInput" style="margin-top:3px;font-size:10px" data-field="identifiers" value="${esc(raw(r.identifiers||""))}" placeholder="upc:... · fnsku:... · item_number:...">`}
   else if(field==="asins"){if(!owner)return;html=`<textarea class="cellArea" data-field="asins" rows="2">${esc(asins(r.asins).join("\n"))}</textarea>`}
@@ -209,7 +211,9 @@ function sortValue(r,key){
   return String(r[key]??"").toLowerCase();
 }
 function sortedRows(){
+  const exact=/^\d+$/.test($("#search").value.trim())?Number($("#search").value.trim()):null;
   return [...current].sort((a,b)=>{
+    if(exact!=null){const ea=Number(a.pallet_number)===exact,eb=Number(b.pallet_number)===exact;if(ea!==eb)return ea?-1:1}
     const av=sortValue(a,sortKey),bv=sortValue(b,sortKey);
     if(av===bv)return Number(a.pallet_number)-Number(b.pallet_number);
     return (av>bv?1:-1)*sortDir;
@@ -266,7 +270,7 @@ function renderRows(){
     const operational=owner?(r.pallet_status==="active"&&viewMode==="active"):r.pallet_status==="active";
     const productHtml=`<b>${esc(r.title)}</b><div class="displaySub">${esc(r.identifiers||"")}</div>`;
     return `<tr data-line="${r.line_id}">
-      <td data-edit-field="pallet">${display(`<b>${esc(r.pallet_number)}</b>`,"pallet",owner&&operational)}</td>
+      <td data-edit-field="pallet">${display(`<b>${esc(r.pallet_number)}</b>`,"pallet",operational)}</td>
       <td data-edit-field="location">${display(esc(r.location||"—"),"location",operational)}</td>
       <td data-edit-field="product">${display(productHtml,"product",owner&&operational)}</td>
       <td data-edit-field="asins">${display(`<div class="asinStack">${asinDisplay(r.asins)}</div>`,"asins",owner&&operational)}</td>
@@ -286,6 +290,7 @@ function renderRows(){
         <button data-dup="${r.line_id}" data-title="${esc(r.title)}">Duplicate</button>
         ${r.pallet_status==="active"&&viewMode==="active"?`<button data-addline="${r.line_id}" title="Add another product to pallet ${esc(r.pallet_number)}">Add product</button>`:""}
         <button data-hist="${r.pallet_id}">History</button>
+        <button data-label="${r.line_id}">Print label</button>
         ${r.pallet_status!=="active"&&!owner?`<button data-react="${r.pallet_id}" data-line="${r.line_id}" data-title="${esc(r.title)}">Reactivate</button>`:""}
       </div></td>
     </tr>`;
@@ -323,6 +328,7 @@ function bindRows(){
   document.querySelectorAll("[data-dup]").forEach(b=>b.onclick=()=>duplicateLine(b.dataset.dup,b.dataset.title));
   document.querySelectorAll("[data-addline]").forEach(b=>b.onclick=()=>openAdd(current.find(x=>Number(x.line_id)===Number(b.dataset.addline))));
   document.querySelectorAll("[data-hist]").forEach(b=>b.onclick=()=>history(b.dataset.hist));
+  document.querySelectorAll("[data-label]").forEach(b=>b.onclick=()=>printLabel(current.find(x=>Number(x.line_id)===Number(b.dataset.label))));
   document.querySelectorAll("[data-react]").forEach(b=>b.onclick=()=>reactivate(b.dataset.react,b.dataset.line,b.dataset.title));
   const rowOf=id=>current.find(x=>Number(x.line_id)===Number(id));
   document.querySelectorAll("[data-archive]").forEach(b=>b.onclick=()=>palletStatus(rowOf(b.dataset.archive),"archive"));
@@ -485,7 +491,7 @@ async function saveInlineRow(line){
   const btn=tr.querySelector("[data-save]");
   const args={
     p_line_id:Number(line),
-    p_pallet_number:owner?Number(val("pallet",r.pallet_number)):Number(r.pallet_number),
+    p_pallet_number:Number(val("pallet",r.pallet_number)),
     p_status:r.pallet_status,
     p_location:val("location",r.location||""),
     p_title:owner?val("title",r.title):r.title,
@@ -545,8 +551,31 @@ function openAdd(target){
   $("#addTargetInfo").textContent=addTarget?`Pallet ${addTarget.pallet_number} at ${addTarget.location||"(no location)"}. The new product line uses this pallet's number and location.`:"";
   $("#a_location_box").classList.toggle("hide",!!addTarget);$("#a_number_box").classList.toggle("hide",!!addTarget);document.querySelectorAll("#addModal input").forEach(i=>{i.value=""});$("#a_label").selectedIndex=0;fnskuTicket++;$("#fnskuPanel").textContent="";
   $("#addModal").classList.add("open");
+  $("#okMsg").textContent="";suggestedNumber=null;numberTyped=false;emptyLocs=[];$("#numHint").textContent="";$("#locChips").innerHTML="";
+  if(!addTarget)prepareNewPallet();
 }
 $("#addBtn").onclick=()=>openAdd(null);
+// The number shown is the one the next automatic pallet would get. Left unchanged, the pallet is numbered at save as
+// before (so two people saving at once cannot collide); a different typed number is used exactly or refused.
+// Only a suggestion the user never touched counts as "automatic"; anything typed (even the same digits) is sent exactly.
+let suggestedNumber=null,numberTyped=false,emptyLocs=[],prepTicket=0;
+$("#a_number").addEventListener("input",()=>{numberTyped=true});
+async function prepareNewPallet(){
+  const ticket=++prepTicket;
+  const [n,l]=await Promise.all([sb.rpc("peek_next_pallet_number"),sb.rpc("list_empty_locations")]);
+  if(ticket!==prepTicket||addTarget||!$("#addModal").classList.contains("open"))return;
+  if(!n.error&&n.data!=null&&!numberTyped&&!$("#a_number").value.trim()){suggestedNumber=Number(n.data);$("#a_number").value=String(suggestedNumber);$("#numHint").textContent="Suggested next number. Type another if needed."}
+  emptyLocs=l.error?[]:(l.data||[]).map(x=>x.location);
+  renderLocChips();
+}
+// Empty = a valid location from the warehouse pattern with no active pallet. Typing narrows the list; any location may still be typed.
+function renderLocChips(){
+  const box=$("#locChips");if(addTarget||!emptyLocs.length){box.innerHTML="";return}
+  const pre=$("#a_location").value.trim().toUpperCase(),hits=emptyLocs.filter(x=>x.startsWith(pre));
+  box.innerHTML=`<div class="muted">${hits.length} empty location${hits.length===1?"":"s"}${pre?` starting with "${esc(pre)}"`:""}${hits.length>12?" (first 12 shown; type more to narrow)":""}</div>`+hits.slice(0,12).map(x=>`<button type="button" class="locChip" data-loc="${esc(x)}">${esc(x)}</button>`).join("");
+  box.querySelectorAll("[data-loc]").forEach(b=>b.onclick=()=>{$("#a_location").value=b.dataset.loc;$("#locWarn").textContent="";renderLocChips()});
+}
+$("#a_location").addEventListener("input",renderLocChips);
 // Find Existing Product. Choosing a match fills every empty box with the saved product's values; anything typed stays.
 // Casepack and carton come together from the product's most recent pallet. The name, and an item weight already saved,
 // belong to the product and are not changed here. "Choose another product" undoes the choice.
@@ -604,19 +633,38 @@ $("#savePallet").onclick=async()=>{$("#saveMsg").textContent="";
   if(cases==null){alert("Cases must be a whole number (0 or more).");return}
   if(casepack==null||casepack<1){alert("Casepack must be a whole number of 1 or more.");return}
   if(!addTarget&&!$("#a_location").value.trim()){alert("Location is required.");return}
-  const numberText=role==="owner"&&!addTarget?$("#a_number").value.trim():"",palletNumber=numberText===""?null:wholeOrNull(numberText);
-  if(numberText!==""&&(palletNumber==null||palletNumber<1)){alert("Pallet number must be a whole number of 1 or more.");return}
+  const numberText=!addTarget?$("#a_number").value.trim():"",keptSuggestion=suggestedNumber!=null&&!numberTyped&&numberText===String(suggestedNumber);
+  const palletNumber=numberText===""||keptSuggestion?null:wholeOrNull(numberText);
+  if(numberText!==""&&!keptSuggestion&&(palletNumber==null||palletNumber<1)){alert("Pallet number must be a whole number of 1 or more.");return}
   const p={p_product_id:selectedProduct,p_upc:$("#a_upc").value||null,p_fnsku:$("#a_fnsku").value||null,p_other_identifier:null,p_item_number:$("#a_item").value||null,p_title:$("#a_title").value||null,p_asins:role==="owner"&&$("#a_asin").value?[$("#a_asin").value.trim()]:null,p_cases:cases,p_casepack:casepack,p_case_box_dimensions:keepText("a_case_dims","product_carton_dimensions"),p_case_box_weight_lb:keepNum("a_case_weight","product_carton_weight_lb"),p_item_dimensions:keepText("a_itemdims","item_dimensions"),p_item_weight_lb:keepNum("a_item_weight","item_weight_lb"),p_country_of_origin:keepText("a_country","country_of_origin"),p_label_status:$("#a_label").value};
   const btn=$("#savePallet");savingPallet=true;btn.disabled=true;btn.textContent="Saving…";
   try{
-    const {error}=addTarget
+    const {data,error}=addTarget
       ?await sb.rpc("add_pallet_line_v1",{...p,p_pallet_id:addTarget.pallet_id,p_expected_version:addTarget.row_version})
-      :role==="owner"
-        ?await sb.rpc("create_pallet_v3",{...p,p_location:$("#a_location").value,p_pallet_number:palletNumber})
-        :await sb.rpc("create_pallet_v2",{...p,p_location:$("#a_location").value});
+      :await sb.rpc("create_pallet_v3",{...p,p_location:$("#a_location").value,p_pallet_number:palletNumber});
     if(error){if(/belongs to another product/.test(String(error.message))){$("#saveMsg").textContent=error.message;return}alert(error.message+(String(error.message).includes(STALE)?"\n\nClose this window and refresh, then try again.":""));return}
+    const made=Array.isArray(data)?data[0]:data;
+    if(made&&!addTarget){const n=Number(made.pallet_number);$("#okMsg").textContent=`Created pallet ${n} at ${$("#a_location").value.trim().toUpperCase()}.`+(palletNumber==null&&suggestedNumber!=null&&n!==suggestedNumber?` Pallet ${suggestedNumber} was taken a moment earlier, so this pallet got the next free number.`:"")}
+    else if(made&&addTarget)$("#okMsg").textContent=`Added to pallet ${addTarget.pallet_number}.`;
     close("addModal");addTarget=null;await load($("#search").value);
   }finally{savingPallet=false;btn.disabled=false;btn.textContent="Save Pallet"}
+}
+// Rollo 4 x 6 pallet label. Opens a label page and the normal print window; nothing is saved. Barcode: Code 128 of the
+// pallet number (JsBarcode, pinned version); scanning it into the search box shows this pallet first.
+function printLabel(r){
+  if(!r)return;
+  const titles=[...new Set(current.filter(x=>Number(x.pallet_id)===Number(r.pallet_id)).map(x=>x.title))];
+  const product=titles[0]?(titles[0]+(titles.length>1?` + ${titles.length-1} more`:"")):"";
+  const num=String(r.pallet_number),big=num.length<=4?"1.55in":(num.length===5?"1.25in":"1in");
+  const w=window.open("","_blank");if(!w){alert("Allow pop-ups for this site to print labels.");return}
+  w.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>Pallet ${esc(num)}</title>
+<style>@page{size:4in 6in;margin:0}html,body{margin:0}body{width:4in;height:6in;font-family:Arial,sans-serif;color:#000}
+.l{box-sizing:border-box;width:4in;height:6in;padding:.25in;display:flex;flex-direction:column;align-items:center;justify-content:space-between;text-align:center}
+.k{font-size:.2in;letter-spacing:.04in}.n{font-weight:700;font-size:${big};line-height:1}.loc{font-weight:700;font-size:.5in}.p{font-size:.17in;max-height:.5in;overflow:hidden}.d{font-size:.14in}svg{width:3.3in;height:1.15in}</style></head>
+<body><div class="l"><div class="k">PALLET</div><div class="n">${esc(num)}</div><svg id="bc"></svg><div class="loc">${esc(r.location||"")}</div><div class="p">${esc(product)}</div><div class="d">Printed ${esc(new Date().toLocaleDateString())}</div></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jsbarcode/3.11.6/JsBarcode.all.min.js"><\/script>
+<script>try{JsBarcode("#bc",${JSON.stringify(num)},{format:"CODE128",displayValue:false,margin:0,height:110,width:3});}catch(e){document.getElementById("bc").outerHTML="<b>Barcode could not be drawn. Reload to retry.</b>"}window.onafterprint=()=>window.close();setTimeout(()=>window.print(),300);<\/script></body></html>`);
+  w.document.close();
 }
 // Prompts: Cancel or an invalid number stops before anything is sent.
 function askWhole(label,min){const s=prompt(label);if(s==null)return null;const n=wholeOrNull(s);if(n==null||n<min){alert(label+" must be a whole number"+(min>0?" of "+min+" or more.":" (0 or more)."));return null}return n}
