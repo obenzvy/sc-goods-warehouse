@@ -295,7 +295,7 @@ function renderRows(){
         <button data-dup="${r.line_id}" data-title="${esc(r.title)}">Duplicate</button>
         <button data-label="${r.line_id}">Print label</button>
         <button data-hist="${r.pallet_id}">History</button>
-        ${r.pallet_status!=="active"&&!owner?`<button data-react="${r.pallet_id}" data-line="${r.line_id}" data-title="${esc(r.title)}">Reactivate</button>`:""}
+        ${(r.pallet_status!=="active"&&!owner)||(r.pallet_status==="active"&&viewMode==="archived")?`<button data-react="${r.pallet_id}" data-line="${r.line_id}" data-title="${esc(r.title)}">Reactivate</button>`:""}
       </div></td>
     </tr>`;
   }).join("");
@@ -304,7 +304,7 @@ function renderRows(){
     const operational=r.pallet_status==="active"&&viewMode==="active";
     return `<div class="pcard"><div class="top"><span class="num">${esc(r.pallet_number)}</span><span class="loc">${esc(r.location||"Unassigned")}</span></div>
       <div>${esc(r.title)}</div><div class="muted">${fmt(r.cases)} cases \u00d7 ${fmt(r.casepack)} \u00b7 <b>${fmt(r.available_units)} units</b></div>
-      <div class="btns">${operational?`<button class="primary" data-cedit="${r.line_id}">Edit</button>`:""}<button data-hist="${r.pallet_id}">History</button></div></div>`;
+      <div class="btns">${operational?`<button class="primary" data-cedit="${r.line_id}">Edit</button>`:""}<button data-hist="${r.pallet_id}">History</button>${r.pallet_status==="active"&&viewMode==="archived"?`<button data-react="${r.pallet_id}" data-line="${r.line_id}" data-title="${esc(r.title)}">Reactivate</button>`:""}</div></div>`;
   }).join("")||'<p class="muted">No pallets found.</p>';
   document.querySelectorAll("[data-cedit]").forEach(b=>b.onclick=()=>openEditSheet(current.find(x=>Number(x.line_id)===Number(b.dataset.cedit))));
   bindRows();
@@ -539,11 +539,12 @@ async function palletStatus(r,action){
   const n=Number(r.pallet_line_count||1);
   const msg=action==="archive"
     ?`Archive pallet ${r.pallet_number} at ${r.location||"(no location)"}?\n\nAll ${n} product line${n===1?"":"s"} on this pallet move to Archived. Quantities, costs, history and deduction records are kept. You can reactivate it later.`
-    :`Reactivate pallet ${r.pallet_number} at ${r.location||"(no location)"}?\n\nLines that still have units become active again with their quantities and costs; empty lines stay archived.`;
+    :`Reactivate pallet ${r.pallet_number} at ${r.location||"(no location)"}?\n\nLines that still have units become active again with their quantities and costs; empty lines stay archived. If no line has units left, you will be asked for the cases found.`;
   if(!confirm(msg))return;
   palletBusy=true;
   try{
     const {error}=await sb.rpc("owner_pallet_commit_v2",{p_action:action,p_pallet_id:r.pallet_id,p_line_id:null,p_expected_version:r.row_version,p_expected_cases:null,p_expected_casepack:null,p_expected_available:null,p_location:null,p_cases:null,p_casepack:null,p_unit_cost:null,p_note:null});
+    if(error&&action==="reactivate"&&String(error.message).startsWith("NO_UNITS:")){await reactivate(r.pallet_id,r.line_id,r.title,r);return}
     if(error)alert(error.message+(String(error.message).includes(STALE)?"\n\nThe latest data will now be loaded.":""));
   }finally{palletBusy=false}
   await load($("#search").value);
@@ -794,7 +795,7 @@ function printLabel(r){
   w.document.close();
 }
 // Prompts: Cancel or an invalid number stops before anything is sent.
-function askWhole(label,min){const s=prompt(label);if(s==null)return null;const n=wholeOrNull(s);if(n==null||n<min){alert(label+" must be a whole number"+(min>0?" of "+min+" or more.":" (0 or more)."));return null}return n}
+function askWhole(label,min,def){const s=prompt(label,def==null?"":String(def));if(s==null)return null;const n=wholeOrNull(s);if(n==null||n<min){alert(label+" must be a whole number"+(min>0?" of "+min+" or more.":" (0 or more)."));return null}return n}
 // Duplicate adds new stock. Only Location and Number of Cases are entered; the server copies everything else from the source line
 // and leaves the source untouched. Each request is saved in this browser before it is sent (ids, location, cases; no costs) and
 // removed once its outcome is known. A request whose answer was lost can only be resent unchanged, which cannot create a second pallet.
@@ -834,7 +835,7 @@ function duplicateLine(id,title){
     }catch(e){msg.textContent=e.message}finally{busyDup=false;btn.disabled=false}
   };
 }
-async function reactivate(pid,lid,title){const r=current.find(x=>Number(x.line_id)===Number(lid));if(!r)return;const loc=prompt("Current location for "+title);if(!loc||!loc.trim())return;const cases=askWhole("Cases found",0);if(cases==null)return;const cp=askWhole("Casepack",1);if(cp==null)return;const {error}=await sb.rpc("reactivate_pallet_line_v2",{p_pallet_id:Number(pid),p_line_id:Number(lid),p_expected_version:r.row_version,p_new_location:loc,p_cases:cases,p_casepack:cp});if(error){alert(error.message);if(String(error.message).includes(STALE))load($("#search").value)}else load($("#search").value)}
+async function reactivate(pid,lid,title,row){const r=row||current.find(x=>Number(x.line_id)===Number(lid));if(!r)return;const onActive=r.pallet_status==="active";const loc=onActive?(r.location||""):prompt("Current location for "+title,r.location||"");if(!onActive&&(!loc||!loc.trim()))return;const cases=askWhole("Cases found",0);if(cases==null)return;const cp=askWhole("Casepack",1,r.casepack);if(cp==null)return;const {error}=await sb.rpc("reactivate_pallet_line_v2",{p_pallet_id:Number(pid),p_line_id:Number(lid),p_expected_version:r.row_version,p_new_location:loc,p_cases:cases,p_casepack:cp});if(error){alert(error.message);if(String(error.message).includes(STALE))load($("#search").value)}else load($("#search").value)}
 async function history(pid){const gen=authGen,{data,error}=await sb.rpc("get_pallet_history_v2",{p_pallet_id:Number(pid)});if(gen!==authGen)return;$("#smTitle").textContent="Pallet History";$("#smBody").innerHTML=error?esc(error.message):(data||[]).map(x=>`<div class="card"><b>${new Date(x.created_at).toLocaleString()}</b><div class="muted">${esc(x.actor_role||"")}</div><p>${esc(x.summary||"Updated.")}</p></div>`).join("")||'<p class="muted">No history yet.</p>';$("#simpleModal").classList.add("open")}
 enter();
 </script>
